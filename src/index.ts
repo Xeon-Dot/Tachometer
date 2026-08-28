@@ -45,10 +45,10 @@ app.all("/*", async ({ request }) => {
   return handleProxy(request)
 })
 
-app.listen(PORT, () => {
-  console.log(`[tachometer] listening on http://localhost:${PORT}`)
-  console.log(`[tachometer] proxy: http://localhost:${PORT}/<target-host>/<path>  e.g. /api.openai.com/v1/responses`)
-  console.log(`[tachometer] dashboard: http://localhost:${PORT}/`)
+app.listen({ port: PORT, hostname: "0.0.0.0" }, () => {
+  console.log(`[tachometer] listening on http://0.0.0.0:${PORT}`)
+  console.log(`[tachometer] proxy: http://0.0.0.0:${PORT}/<target-host>/<path>  e.g. /api.openai.com/v1/responses`)
+  console.log(`[tachometer] dashboard: http://0.0.0.0:${PORT}/`)
 })
 
 export type App = typeof app
