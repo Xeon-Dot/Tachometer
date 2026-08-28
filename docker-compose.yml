@@ -3,12 +3,27 @@ services:
     image: mongo:7
     ports: ["27017:27017"]
     volumes: [mongo_data:/data/db]
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
   app:
     build: .
     ports: ["3000:3000"]
     environment:
       MONGO_URL: mongodb://mongo:27017
       DB_NAME: tachometer
-    depends_on: [mongo]
+    depends_on:
+      mongo:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "bun", "-e", "fetch('http://localhost:'+(process.env.PORT||3000)+'/health').then(r=>r.json()).then(j=>{if(!j.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+      start_interval: 5s
 volumes:
   mongo_data:

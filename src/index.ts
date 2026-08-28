@@ -17,6 +17,48 @@ app.get("/health", () => ({
   time: new Date().toISOString(),
 }))
 
+app.get("/healthz", async () => {
+  const started = Date.now()
+  let dbStatus: "ok" | "degraded" | "memory" = "memory"
+  let dbLatencyMs: number | null = null
+  if (isDbConnected()) {
+    try {
+      const { getCollection } = await import("./db")
+      const col = getCollection()
+      const t0 = Date.now()
+      await col!.findOne({}, { projection: { _id: 1 } })
+      dbLatencyMs = Date.now() - t0
+      dbStatus = "ok"
+    } catch {
+      dbStatus = "degraded"
+    }
+  }
+  return {
+    ok: true,
+    service: "tachometer",
+    db: dbStatus,
+    dbLatencyMs,
+    uptimeSec: Math.round(process.uptime()),
+    time: new Date().toISOString(),
+    latencyMs: Date.now() - started,
+  }
+})
+
+app.get("/readyz", async ({ set }: any) => {
+  if (!isDbConnected()) {
+    set.status = 503
+    return { ok: false, ready: false, db: "memory", reason: "db not connected (running in memory mode)" }
+  }
+  try {
+    const { getCollection } = await import("./db")
+    await getCollection()!.findOne({}, { projection: { _id: 1 } })
+    return { ok: true, ready: true, db: "ok" }
+  } catch (e) {
+    set.status = 503
+    return { ok: false, ready: false, db: "degraded", reason: (e as Error).message }
+  }
+})
+
 app.get("/api/requests", async ({ query }) => {
   const limit = Math.min(Number((query as any).limit || 100), 500)
   const requests = await getRecent(limit)
@@ -39,7 +81,7 @@ app.get("/", () => new Response(dashboardHtml, { headers: { "content-type": "tex
 app.all("/*", async ({ request }) => {
   const url = new URL(request.url)
   const path = url.pathname
-  if (path === "/" || path === "/health" || path.startsWith("/api/")) {
+  if (path === "/" || path === "/health" || path === "/healthz" || path === "/readyz" || path.startsWith("/api/")) {
     return new Response("Not found", { status: 404 })
   }
   return handleProxy(request)
