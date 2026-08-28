@@ -347,36 +347,47 @@ function ensureCharts(series, summary){
   const counts = series.map(s=>s.count);
   const lat = series.map(s=>s.avgLatency);
   const sum = summary.find(s=>s.provider==='__all__');
-  if(mainChart) mainChart.destroy();
-  if(tokenChart) tokenChart.destroy();
+  const hint = document.getElementById('tokenHint');
+  if(hint) hint.textContent = sum ? \`RPM \${sum.rpm} \\u00b7 TPM in \${fmt(sum.tpm.input)} / out \${fmt(sum.tpm.output)} \\u00b7 tokens/sec \${fmt(sum.tokensPerSec)}\` : '\\u2014';
   const grid = 'rgba(228,228,231,1)';
   const tick = '#52525b';
   const common = chartDefaults();
-  mainChart = new Chart(ctx1, {
-    type:'bar',
-    data:{labels, datasets:[
-      {label:'Requests', data:counts, yAxisID:'y', backgroundColor:'#18181b', borderRadius:4, borderSkipped:false, barThickness:10, maxBarThickness:14},
-      {label:'Avg latency (ms)', data:lat, yAxisID:'y1', type:'line', borderColor:'#71717a', backgroundColor:'rgba(113,113,122,.08)', tension:.35, pointRadius:0, pointHoverRadius:3, borderWidth:1.5}
-    ]},
-    options:{
-      ...common,
-      interaction:{mode:'index',intersect:false},
-      plugins:{legend:{labels:{color:tick,boxWidth:12,font:{family:'JetBrains Mono',size:11},usePointStyle:true,pointStyle:'rectRounded'}}},
-      scales:{
-        x:{ticks:{color:tick,maxTicksLimit:12,font:{size:11}}, grid:{color:grid, lineWidth:1, drawBorder:false}, border:{display:false}},
-        y:{position:'left', ticks:{color:tick,font:{size:11}}, grid:{color:grid, lineWidth:1, drawBorder:false}, border:{display:false}},
-        y1:{position:'right', ticks:{color:tick,font:{size:11}}, grid:{display:false}, border:{display:false}}
+  const tokenData = [sum?sum.inputTokens.total:0, sum?sum.outputTokens.total:0, sum?sum.cachedTokens.total:0];
+  if(mainChart){
+    mainChart.data.labels = labels;
+    mainChart.data.datasets[0].data = counts;
+    mainChart.data.datasets[1].data = lat;
+    mainChart.update('none');
+  } else {
+    mainChart = new Chart(ctx1, {
+      type:'bar',
+      data:{labels, datasets:[
+        {label:'Requests', data:counts, yAxisID:'y', backgroundColor:'#18181b', borderRadius:4, borderSkipped:false, barThickness:10, maxBarThickness:14},
+        {label:'Avg latency (ms)', data:lat, yAxisID:'y1', type:'line', borderColor:'#71717a', backgroundColor:'rgba(113,113,122,.08)', tension:.35, pointRadius:0, pointHoverRadius:3, borderWidth:1.5}
+      ]},
+      options:{
+        ...common,
+        interaction:{mode:'index',intersect:false},
+        plugins:{legend:{labels:{color:tick,boxWidth:12,font:{family:'JetBrains Mono',size:11},usePointStyle:true,pointStyle:'rectRounded'}}},
+        scales:{
+          x:{ticks:{color:tick,maxTicksLimit:12,font:{size:11}}, grid:{color:grid, lineWidth:1, drawBorder:false}, border:{display:false}},
+          y:{position:'left', ticks:{color:tick,font:{size:11}}, grid:{color:grid, lineWidth:1, drawBorder:false}, border:{display:false}},
+          y1:{position:'right', ticks:{color:tick,font:{size:11}}, grid:{display:false}, border:{display:false}}
+        }
       }
-    }
-  });
-  const hint = document.getElementById('tokenHint');
-  if(hint) hint.textContent = sum ? \`RPM \${sum.rpm} \\u00b7 TPM in \${fmt(sum.tpm.input)} / out \${fmt(sum.tpm.output)} \\u00b7 tokens/sec \${fmt(sum.tokensPerSec)}\` : '\\u2014';
+    });
+  }
   const doughnutColors = ['#18181b','#71717a','#e4e4e7'];
-  tokenChart = new Chart(ctx2, {
-    type:'doughnut',
-    data:{labels:['Input','Output','Cached'], datasets:[{data:[sum?sum.inputTokens.total:0, sum?sum.outputTokens.total:0, sum?sum.cachedTokens.total:0], backgroundColor:doughnutColors, borderWidth:0, hoverOffset:1}]},
-    options:{...common, plugins:{legend:{labels:{color:tick,boxWidth:12,font:{family:'JetBrains Mono',size:11},usePointStyle:true}}}, cutout:'64%'}
-  });
+  if(tokenChart){
+    tokenChart.data.datasets[0].data = tokenData;
+    tokenChart.update('none');
+  } else {
+    tokenChart = new Chart(ctx2, {
+      type:'doughnut',
+      data:{labels:['Input','Output','Cached'], datasets:[{data:tokenData, backgroundColor:doughnutColors, borderWidth:0, hoverOffset:1}]},
+      options:{...common, plugins:{legend:{labels:{color:tick,boxWidth:12,font:{family:'JetBrains Mono',size:11},usePointStyle:true}}}, cutout:'64%'}
+    });
+  }
 }
 
 function renderKpis(summary){
@@ -399,7 +410,17 @@ function renderProviders(summaries){
   const meta = document.getElementById('providerMeta');
   const list = summaries.filter(s=>s.provider!=='__all__');
   const cur = sel.value;
-  sel.innerHTML = '<option value="__all__">전체 프로바이더</option>' + list.map(s=>\`<option value="\${s.provider}">\${s.provider} (\${s.totalRequests})</option>\`).join('');
+  const nextSig = list.map(s=>s.provider).join('|');
+  const isFocused = document.activeElement === sel;
+  if(sel.dataset.sig !== nextSig && !isFocused){
+    sel.innerHTML = '<option value="__all__">전체 프로바이더</option>' + list.map(s=>\`<option value="\${s.provider}">\${s.provider} (\${s.totalRequests})</option>\`).join('');
+    sel.dataset.sig = nextSig;
+  } else if(sel.dataset.sig === nextSig && !isFocused){
+    for(const s of list){
+      const opt = Array.from(sel.options).find(o=>o.value===s.provider);
+      if(opt) opt.textContent = s.provider + ' (' + s.totalRequests + ')';
+    }
+  }
   sel.value = list.some(s=>s.provider===cur) ? cur : '__all__';
   if(wrap) wrap.setAttribute('aria-busy','false');
   if(meta) meta.textContent = list.length ? \`\${list.length} providers\` : '';
@@ -489,9 +510,13 @@ function clearAlert(){
   if(slot){ slot.style.display='none'; slot.innerHTML=''; }
 }
 
-async function load(){
+let isLoading = false;
+async function load(opts){
+  const manual = !!(opts && opts.manual);
+  if(isLoading) return;
+  isLoading = true;
   const btn = document.getElementById('refreshBtn');
-  if(btn){ btn.disabled=true; btn.textContent='불러오는 중…'; }
+  if(manual && btn){ btn.disabled=true; btn.textContent='불러오는 중…'; }
   const w = document.getElementById('windowSel').value;
   try{
     const [statsRes, reqRes] = await Promise.all([
@@ -513,12 +538,13 @@ async function load(){
     const kpis = document.getElementById('kpis');
     if(kpis && kpis.querySelector('.skeleton')){ kpis.innerHTML = '<div class="alert" role="alert">데이터를 불러오지 못했습니다. 새로고침을 눌러 다시 시도하세요.</div>'; }
   } finally {
-    if(btn){ btn.disabled=false; btn.textContent='새로고침'; }
+    isLoading = false;
+    if(manual && btn){ btn.disabled=false; btn.textContent='새로고침'; }
   }
 }
 
-document.getElementById('refreshBtn').addEventListener('click', load);
-document.getElementById('windowSel').addEventListener('change', load);
+document.getElementById('refreshBtn').addEventListener('click', ()=> load({manual:true}));
+document.getElementById('windowSel').addEventListener('change', ()=> load({manual:true}));
 document.getElementById('recentSearch').addEventListener('input', ()=> renderRecent(filteredRecent()));
 document.getElementById('copyBtn').addEventListener('click', async ()=>{
   const pre = document.getElementById('exampleCode');
