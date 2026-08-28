@@ -11,7 +11,7 @@ export const dashboardHtml = `<!DOCTYPE html>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -31,7 +31,7 @@ export const dashboardHtml = `<!DOCTYPE html>
   --radius-sm:6px;
 }
 html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;scrollbar-gutter:stable}
-body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--foreground);min-height:100vh;line-height:1.5;font-size:14px}
+body{font-family:'JetBrains Mono',ui-monospace,monospace;background:var(--bg);color:var(--foreground);min-height:100vh;line-height:1.5;font-size:14px}
 .mono{font-family:'JetBrains Mono',ui-monospace,monospace}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 a{color:var(--foreground);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--border-strong);text-decoration-thickness:1px}
@@ -361,7 +361,7 @@ function ensureCharts(series, summary){
     options:{
       ...common,
       interaction:{mode:'index',intersect:false},
-      plugins:{legend:{labels:{color:tick,boxWidth:12,font:{family:'Inter',size:11},usePointStyle:true,pointStyle:'rectRounded'}}},
+      plugins:{legend:{labels:{color:tick,boxWidth:12,font:{family:'JetBrains Mono',size:11},usePointStyle:true,pointStyle:'rectRounded'}}},
       scales:{
         x:{ticks:{color:tick,maxTicksLimit:12,font:{size:11}}, grid:{color:grid, lineWidth:1, drawBorder:false}, border:{display:false}},
         y:{position:'left', ticks:{color:tick,font:{size:11}}, grid:{color:grid, lineWidth:1, drawBorder:false}, border:{display:false}},
@@ -375,7 +375,7 @@ function ensureCharts(series, summary){
   tokenChart = new Chart(ctx2, {
     type:'doughnut',
     data:{labels:['Input','Output','Cached'], datasets:[{data:[sum?sum.inputTokens.total:0, sum?sum.outputTokens.total:0, sum?sum.cachedTokens.total:0], backgroundColor:doughnutColors, borderWidth:0, hoverOffset:1}]},
-    options:{...common, plugins:{legend:{labels:{color:tick,boxWidth:12,font:{family:'Inter',size:11},usePointStyle:true}}}, cutout:'64%'}
+    options:{...common, plugins:{legend:{labels:{color:tick,boxWidth:12,font:{family:'JetBrains Mono',size:11},usePointStyle:true}}}, cutout:'64%'}
   });
 }
 
