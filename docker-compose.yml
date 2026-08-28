@@ -1,0 +1,14 @@
+services:
+  mongo:
+    image: mongo:7
+    ports: ["27017:27017"]
+    volumes: [mongo_data:/data/db]
+  app:
+    build: .
+    ports: ["3000:3000"]
+    environment:
+      MONGO_URL: mongodb://mongo:27017
+      DB_NAME: tachometer
+    depends_on: [mongo]
+volumes:
+  mongo_data:
