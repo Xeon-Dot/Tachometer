@@ -93,11 +93,13 @@ function extractFromSseBuffer(buffer: string) {
 
 export async function handleProxy(request: Request): Promise<Response> {
   const url = new URL(request.url)
-  const pathname = url.pathname
+  let pathname = url.pathname
+  if (pathname.startsWith("/pass/")) pathname = pathname.slice(5)
+  else if (pathname === "/pass") pathname = "/"
 
   const { host, rest } = extractProvider(pathname)
   if (!host) {
-    return new Response(JSON.stringify({ error: "Invalid proxy path. Use /<target-host>/<path> e.g. /api.openai.com/v1/responses" }), {
+    return new Response(JSON.stringify({ error: "Invalid proxy path. Use /pass/<target-host>/<path> e.g. /pass/api.openai.com/v1/responses" }), {
       status: 400,
       headers: { "content-type": "application/json" },
     })

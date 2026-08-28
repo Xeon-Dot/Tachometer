@@ -90,19 +90,19 @@ a:hover{text-decoration:underline}
 
 <div class="wrap">
   <div class="card" style="margin-top:4px">
-    <h3>프록시 사용법 <span class="mono" style="font-size:11px;color:var(--muted)">https://tach.cometer/&lt;target-host&gt;/&lt;path&gt;</span></h3>
-    <div class="code" id="exampleCode">curl https://tach.cometer/api.openai.com/v1/responses \\
+    <h3>프록시 사용법 <span class="mono" style="font-size:11px;color:var(--muted)">https://tach.cometer/pass/&lt;target-host&gt;/&lt;path&gt;</span></h3>
+    <div class="code" id="exampleCode">curl https://tach.cometer/pass/api.openai.com/v1/responses \\
   -H "Authorization: Bearer $OPENAI_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{"model":"gpt-4o-mini","input":"hello"}'
 
 # Anthropic
-curl https://tach.cometer/api.anthropic.com/v1/messages \\
+curl https://tach.cometer/pass/api.anthropic.com/v1/messages \\
   -H "x-api-key: $ANTHROPIC_API_KEY" ...
 
 # 임의 프로바이더도 동일 패턴
-curl https://tach.cometer/api.some.provider/api/v1/chat/completions ...</div>
-    <p class="hint" style="margin-top:10px">요청은 그대로 패스스루되며, 응답 헤더·바디를 그대로 전달합니다. TTFT, 지연시간, 토큰, RPM/TPM이 자동 계측됩니다. 로컬에서는 <span class="mono">http://localhost:3000/api.openai.com/...</span> 형태로 호출하세요.</p>
+curl https://tach.cometer/pass/api.some.provider/api/v1/chat/completions ...</div>
+    <p class="hint" style="margin-top:10px">요청은 그대로 패스스루되며, 응답 헤더·바디를 그대로 전달합니다. TTFT, 지연시간, 토큰, RPM/TPM이 자동 계측됩니다. 로컬에서는 <span class="mono">http://localhost:3000/pass/api.openai.com/...</span> 형태로 호출하세요.</p>
   </div>
 
   <div class="kpis" id="kpis"></div>

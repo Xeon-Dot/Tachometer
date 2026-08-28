@@ -81,15 +81,15 @@ app.get("/", () => new Response(dashboardHtml, { headers: { "content-type": "tex
 app.all("/*", async ({ request }) => {
   const url = new URL(request.url)
   const path = url.pathname
-  if (path === "/" || path === "/health" || path === "/healthz" || path === "/readyz" || path.startsWith("/api/")) {
-    return new Response("Not found", { status: 404 })
+  if (path === "/pass" || path.startsWith("/pass/")) {
+    return handleProxy(request)
   }
-  return handleProxy(request)
+  return new Response("Not found", { status: 404 })
 })
 
 app.listen({ port: PORT, hostname: "0.0.0.0" }, () => {
   console.log(`[tachometer] listening on http://0.0.0.0:${PORT}`)
-  console.log(`[tachometer] proxy: http://0.0.0.0:${PORT}/<target-host>/<path>  e.g. /api.openai.com/v1/responses`)
+  console.log(`[tachometer] proxy: http://0.0.0.0:${PORT}/pass/<target-host>/<path>  e.g. /pass/api.openai.com/v1/responses`)
   console.log(`[tachometer] dashboard: http://0.0.0.0:${PORT}/`)
 })
 
