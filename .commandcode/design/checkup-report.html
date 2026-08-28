@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tachometer — Checkup Report</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.report-section { border: 1px solid #222226; background: #0a0a0b; position: relative; }
+.corner-box { position: absolute; width: 20px; height: 20px; border: 1px solid #222226; background: #000; }
+</style>
+</head>
+<body class="bg-black text-[#fafafa]">
+<main class="mx-auto w-full max-w-6xl px-5 py-8 md:px-10 md:py-12">
+
+<header class="report-section mb-8 p-6 md:p-8">
+<div class="corner-box left-0 top-0 -translate-x-1/2 -translate-y-1/2"></div>
+<div class="corner-box right-0 top-0 translate-x-1/2 -translate-y-1/2"></div>
+<div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+<div>
+<div class="mono mb-2 text-xs tracking-widest text-[#666]">// CHECKUP</div>
+<h1 class="text-4xl font-bold tracking-tight md:text-6xl">TACHOMETER</h1>
+<p class="mt-2 text-sm text-[#666]">AI API Performance Dashboard — <span class="mono text-xs">src/dashboard.ts</span></p>
+</div>
+<div class="mono text-left text-xs text-[#666] md:text-right">
+<div>COMMANDCODE REPORT</div>
+<div class="text-[#444]">2026-08-28 · single-file dashboard</div>
+<div class="mt-2 inline-flex border border-[#222226] px-2 py-1 text-[11px] text-[#888]">Product · Monitor / Compare</div>
+</div>
+</div>
+</header>
+
+<section class="report-section mb-8 p-6 md:p-8">
+<div class="corner-box left-0 top-0 -translate-x-1/2 -translate-y-1/2"></div>
+<div class="corner-box right-0 top-0 translate-x-1/2 -translate-y-1/2"></div>
+<div class="grid gap-8 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+<div>
+<div class="mono mb-2 text-xs tracking-widest text-[#666]">// OVERALL</div>
+<div class="text-6xl font-bold tracking-tight md:text-7xl">35</div>
+<div class="mt-1 text-lg text-[#666]">/ 60</div>
+<div class="mt-4 inline-flex border border-[#fbbf24]/30 bg-[#fbbf24]/10 px-3 py-1 text-sm font-medium text-[#fbbf24]">NEEDS CHANGES</div>
+<p class="mono mt-3 text-xs text-[#555]">No HIGH · 7 MEDIUM · 2 LOW</p>
+</div>
+<div>
+<div class="mono mb-3 text-xs tracking-widest text-[#666]">// TL;DR</div>
+<p class="text-sm leading-6 text-[#a0a0a0]">Flat shadcn redesign landed — zinc borders, 6/8px radii, Inter+Mono, no neon leaking. Tokens are coherent. Surface is shippable for internal monitoring.</p>
+<p class="mt-3 text-sm leading-6 text-[#a0a0a0]">But 5 of 6 vitals sit at <span class="text-[#fbbf24]">WATCH</span>: muted zinc at 11px strains scanning, controls miss iOS zoom + 44px floors, and a11y/speed primitives (table semantics, live regions, reduced-motion, font-display) are absent.</p>
+<p class="mt-4 border-l border-[#fbbf24] pl-4 text-sm leading-6 text-[#fbbf24]">Next → <span class="mono">/design a11y</span> (tables, live region, reduced-motion) → <span class="mono">/design responsive</span> (16px, 44px) → <span class="mono">/design recolor</span> (muted-fg → zinc-600).</p>
+</div>
+</div>
+</section>
+
+<section class="report-section mb-8 p-6 md:p-8">
+<div class="mono mb-6 text-xs tracking-widest text-[#666]">// HEURISTIC SCORES</div>
+<div class="overflow-x-auto">
+<table class="w-full min-w-[720px] border-collapse text-sm">
+<thead>
+<tr class="border-b border-[#222226] mono text-left text-xs text-[#666]">
+<th class="py-3 pr-4 font-normal">#</th>
+<th class="py-3 pr-4 font-normal">HEURISTIC</th>
+<th class="py-3 pr-4 font-normal">SCORE</th>
+<th class="py-3 font-normal">KEY FINDING</th>
+</tr>
+</thead>
+<tbody class="text-sm">
+<tr class="border-b border-[#1a1a1e]">
+<td class="py-4 pr-4 text-[#555]">1</td>
+<td class="py-4 pr-4 text-[#fafafa]">Intentionality</td>
+<td class="py-4 pr-4 font-mono font-bold text-[#34d399]">10 / 10</td>
+<td class="py-4 text-[#a0a0a0]">Flat shadcn system fully applied — coherent tokens throughout.</td>
+</tr>
+<tr class="border-b border-[#1a1a1e]">
+<td class="py-4 pr-4 text-[#555]">2</td>
+<td class="py-4 pr-4 text-[#fafafa]">Readability</td>
+<td class="py-4 pr-4 font-mono font-bold text-[#fbbf24]">5 / 10</td>
+<td class="py-4 text-[#a0a0a0]"><span class="mono text-xs">#71717a</span> on <span class="mono text-xs">#fafafa</span> at 11–12px caps is AA-borderline; 9-col tables are dense.</td>
+</tr>
+<tr class="border-b border-[#1a1a1e]">
+<td class="py-4 pr-4 text-[#555]">3</td>
+<td class="py-4 pr-4 text-[#fafafa]">Usability</td>
+<td class="py-4 pr-4 font-mono font-bold text-[#fbbf24]">5 / 10</td>
+<td class="py-4 text-[#a0a0a0]">Core monitor works; missing search/filter on recent, skeletons, copy affordance on curl.</td>
+</tr>
+<tr class="border-b border-[#1a1a1e]">
+<td class="py-4 pr-4 text-[#555]">4</td>
+<td class="py-4 pr-4 text-[#fafafa]">Responsiveness</td>
+<td class="py-4 pr-4 font-mono font-bold text-[#fbbf24]">5 / 10</td>
+<td class="py-4 text-[#a0a0a0]">Grids collapse, tables scroll, but controls are 13px/36px — miss iOS + 44px floors.</td>
+</tr>
+<tr class="border-b border-[#1a1a1e]">
+<td class="py-4 pr-4 text-[#555]">5</td>
+<td class="py-4 pr-4 text-[#fafafa]">Speed</td>
+<td class="py-4 pr-4 font-mono font-bold text-[#fbbf24]">5 / 10</td>
+<td class="py-4 text-[#a0a0a0]">Blocking Google Fonts + sync Chart.js UMD, no display=swap/defer/preconnect chain.</td>
+</tr>
+<tr>
+<td class="py-4 pr-4 text-[#555]">6</td>
+<td class="py-4 pr-4 text-[#fafafa]">Accessibility</td>
+<td class="py-4 pr-4 font-mono font-bold text-[#fbbf24]">5 / 10</td>
+<td class="py-4 text-[#a0a0a0]">Keyboard path exists; tables lack semantics, no live region, no reduced-motion.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<section class="report-section mb-8 p-6 md:p-8">
+<div class="mono mb-6 text-xs tracking-widest text-[#666]">// COGNITIVE LOAD / RISK</div>
+<div class="grid gap-6 md:grid-cols-2">
+<div>
+<div class="mb-3 text-xl font-semibold">Watch — contained but systemic</div>
+<ul class="space-y-3 text-sm text-[#a0a0a0]">
+<li><span class="mono mr-2 text-[#34d399]">PASS</span>Composition matches Monitor+Compare; priority/change/freshness visible.</li>
+<li><span class="mono mr-2 text-[#34d399]">PASS</span>Token system is disciplined; no legacy theme leaking.</li>
+<li><span class="mono mr-2 text-[#fbbf24]">WATCH</span>6 MEDIUM + 2 LOW findings — each contained, collectively noisy.</li>
+<li><span class="mono mr-2 text-[#fbbf24]">WATCH</span>Auto-poll + Chart.js re-animate every 2s without reduced-motion guard.</li>
+<li><span class="mono mr-2 text-[#fbbf24]">WATCH</span>Tables scan poorly at 320–375px without sticky affordance.</li>
+</ul>
+</div>
+<div>
+<div class="mono mb-3 text-xs tracking-widest text-[#666]">// NEXT MODES</div>
+<div class="flex flex-wrap gap-2">
+<span class="border border-[#333] px-3 py-1 text-sm text-[#a0a0a0]">/design a11y</span>
+<span class="border border-[#333] px-3 py-1 text-sm text-[#a0a0a0]">/design responsive</span>
+<span class="border border-[#333] px-3 py-1 text-sm text-[#a0a0a0]">/design recolor</span>
+<span class="border border-[#333] px-3 py-1 text-sm text-[#a0a0a0]">/design finish</span>
+</div>
+<p class="mono mt-4 text-xs leading-5 text-[#555]">No redesign needed — fix primitives then tighten muted-fg and defer chain.</p>
+</div>
+</div>
+</section>
+
+<section class="report-section mb-8 p-6 md:p-8">
+<div class="mono mb-6 text-xs tracking-widest text-[#666]">// WHAT'S WORKING</div>
+<div class="grid gap-4 md:grid-cols-3">
+<article class="border border-[#1f1f24] p-4">
+<h2 class="mb-2 text-sm font-semibold">Flat token discipline</h2>
+<p class="text-sm leading-6 text-[#a0a0a0]">Single <span class="mono text-xs">--border/--muted/--foreground</span> spine end-to-end. 6/8px radii, 44/— rhythm, Inter+Mono. Old neon fully gone.</p>
+</article>
+<article class="border border-[#1f1f24] p-4">
+<h2 class="mb-2 text-sm font-semibold">Monitor composition</h2>
+<p class="text-sm leading-6 text-[#a0a0a0]">KPI → requests/latency → token split → model ranking → provider cards → recent rows. Window + provider filter + LIVE + 2s poll support freshness.</p>
+</article>
+<article class="border border-[#1f1f24] p-4">
+<h2 class="mb-2 text-sm font-semibold">Predictable density</h2>
+<p class="text-sm leading-6 text-[#a0a0a0]">Card/metrics/tableWrap share 1px border + muted bg language. Scanning lane is stable at desktop; hover on rows is quiet.</p>
+</article>
+</div>
+</section>
+
+<section class="report-section mb-8 p-6 md:p-8">
+<div class="mono mb-6 text-xs tracking-widest text-[#666]">// PRIORITY ISSUES</div>
+<div class="space-y-5">
+
+<article class="border border-[#2a2430] bg-[#0f0c13] p-5">
+<div class="mono mb-2 text-xs text-[#fbbf24]">MEDIUM · Interaction · src/dashboard.ts:38</div>
+<h2 class="mb-2 text-lg font-semibold">Selects at 13px trigger iOS Safari auto-zoom</h2>
+<p class="mb-4 text-sm leading-6 text-[#a0a0a0]">BEFORE: <span class="mono text-xs">.select {font-size:13px}</span> on all viewports. Any focus on a sub-16px form control zooms the viewport and breaks the sticky topbar.</p>
+<div class="border-l border-[#fbbf24] pl-4 text-sm leading-6 text-[#fbbf24]">FIX: Add <span class="mono text-xs">@media(max-width:640px){ .select{font-size:16px} }</span> and same for future inputs. Never use <span class="mono text-xs">maximum-scale=1</span>.</div>
+</article>
+
+<article class="border border-[#2a2430] bg-[#0f0c13] p-5">
+<div class="mono mb-2 text-xs text-[#fbbf24]">MEDIUM · Interaction · src/dashboard.ts:38</div>
+<h2 class="mb-2 text-lg font-semibold">Controls below 44px touch target</h2>
+<p class="mb-4 text-sm leading-6 text-[#a0a0a0]">BEFORE: <span class="mono text-xs">.select,.btn {height:36px}</span>. Misses WCAG 44×44 floor; wrapped topbar at narrow makes mis-taps likely.</p>
+<div class="border-l border-[#fbbf24] pl-4 text-sm leading-6 text-[#fbbf24]">FIX: Raise to 44px, or keep visual 36px and expand hit area via <span class="mono text-xs">::before/min-height:44px</span>.</div>
+</article>
+
+<article class="border border-[#2a2430] bg-[#0f0c13] p-5">
+<div class="mono mb-2 text-xs text-[#fbbf24]">MEDIUM · Accessibility · src/dashboard.ts:47 + Chart.js</div>
+<h2 class="mb-2 text-lg font-semibold">No prefers-reduced-motion guard</h2>
+<p class="mb-4 text-sm leading-6 text-[#a0a0a0]">BEFORE: Live indicator and Chart.js re-animate on every 2s poll with no <span class="mono text-xs">prefers-reduced-motion</span> branch.</p>
+<div class="border-l border-[#fbbf24] pl-4 text-sm leading-6 text-[#fbbf24]">FIX: <span class="mono text-xs">@media(prefers-reduced-motion:reduce){ .dot{animation:none} }</span> + <span class="mono text-xs">animation:false</span> for Chart.js when reduced-motion matches.</div>
+</article>
+
+<article class="border border-[#2a2430] bg-[#0f0c13] p-5">
+<div class="mono mb-2 text-xs text-[#fbbf24]">MEDIUM · Accessibility · src/dashboard.ts:162 / 178</div>
+<h2 class="mb-2 text-lg font-semibold">Tables lack semantics; auto-poll has no live region</h2>
+<p class="mb-4 text-sm leading-6 text-[#a0a0a0]">BEFORE: <span class="mono text-xs">&lt;th&gt;</span> without <span class="mono text-xs">scope="col"</span>, no <span class="mono text-xs">&lt;caption&gt;</span>, and <span class="mono text-xs">#kpis/#recentBody</span> update every 2s with no <span class="mono text-xs">aria-live</span>.</p>
+<div class="border-l border-[#fbbf24] pl-4 text-sm leading-6 text-[#fbbf24]">FIX: Add <span class="mono text-xs">&lt;caption class="sr-only"&gt;</span> + <span class="mono text-xs">scope="col"</span> on each th; add <span class="mono text-xs">aria-live="polite" aria-atomic="true"</span> on KPI/recent wrappers.</div>
+</article>
+
+<article class="border border-[#2a2430] bg-[#0f0c13] p-5">
+<div class="mono mb-2 text-xs text-[#fbbf24]">MEDIUM · Color · src/dashboard.ts:16</div>
+<h2 class="mb-2 text-lg font-semibold">Muted zinc too light for 11px caps</h2>
+<p class="mb-4 text-sm leading-6 text-[#a0a0a0]">BEFORE: <span class="mono text-xs">--muted-fg:#71717a</span> on <span class="mono text-xs">#fafafa/#fff</span> at 11px uppercase (KPI labels, th, hints) ≈4.6:1. Passes large text, fails comfort for small caps.</p>
+<div class="border-l border-[#fbbf24] pl-4 text-sm leading-6 text-[#fbbf24]">FIX: Use <span class="mono text-xs">#52525b</span> (zinc-600, ≈7.1:1) for 11–12px caps; keep <span class="mono text-xs">#71717a</span> only for ≥14px or borders.</div>
+</article>
+
+<article class="border border-[#2a2430] bg-[#0f0c13] p-5">
+<div class="mono mb-2 text-xs text-[#fbbf24]">MEDIUM · Speed · src/dashboard.ts:8–9</div>
+<h2 class="mb-2 text-lg font-semibold">Render-blocking font + Chart.js chain</h2>
+<p class="mb-4 text-sm leading-6 text-[#a0a0a0]">BEFORE: Google Fonts without <span class="mono text-xs">display=swap</span>, only one <span class="mono text-xs">preconnect</span>, Chart.js loaded sync UMD — parser stalls before first paint.</p>
+<div class="border-l border-[#fbbf24] pl-4 text-sm leading-6 text-[#fbbf24]">FIX: Add <span class="mono text-xs">&amp;display=swap</span> + <span class="mono text-xs">preconnect</span> to <span class="mono text-xs">fonts.gstatic.com</span> &amp; <span class="mono text-xs">cdn.jsdelivr.net</span>; load Chart.js with <span class="mono text-xs">defer</span>.</div>
+</article>
+
+<article class="border border-[#2a2430] bg-[#0f0c13] p-5">
+<div class="mono mb-2 text-xs text-[#fbbf24]">MEDIUM · Layout · src/dashboard.ts:159 / 178</div>
+<h2 class="mb-2 text-lg font-semibold">Tables scroll without affordance; row identity lost</h2>
+<p class="mb-4 text-sm leading-6 text-[#a0a0a0]">BEFORE: <span class="mono text-xs">overflow:auto</span> only on 9-col tables. At 320–375px the lane scrolls with no shadow/gradient or sticky first col.</p>
+<div class="border-l border-[#fbbf24] pl-4 text-sm leading-6 text-[#fbbf24]">FIX: Add scroll shadow/gradient + <span class="mono text-xs">position:sticky; left:0</span> on first th/td (time/model) with hint label.</div>
+</article>
+
+<article class="border border-[#1e2330] bg-[#0b0e14] p-5">
+<div class="mono mb-2 text-xs text-[#94a3b8]">LOW · Type · src/dashboard.ts:65</div>
+<h2 class="mb-2 text-base font-semibold">curl block uses break-all</h2>
+<p class="mb-4 text-sm leading-6 text-[#a0a0a0]">BEFORE: <span class="mono text-xs">word-break:break-all</span> fractures tokens mid-word.</p>
+<div class="border-l border-[#94a3b8] pl-4 text-sm leading-6 text-[#94a3b8]">FIX: <span class="mono text-xs">overflow-x:auto; white-space:pre; word-break:normal;</span> — horizontal scroll, not fractured wrap.</div>
+</article>
+
+<article class="border border-[#1e2330] bg-[#0b0e14] p-5">
+<div class="mono mb-2 text-xs text-[#94a3b8]">LOW · Surface · src/dashboard.ts:40–45</div>
+<h2 class="mb-2 text-base font-semibold">Focus ring via shadow may clip</h2>
+<p class="mb-4 text-sm leading-6 text-[#a0a0a0]">BEFORE: <span class="mono text-xs">box-shadow:0 0 0 1px</span> as focus ring — can clip on rounded overflow.</p>
+<div class="border-l border-[#94a3b8] pl-4 text-sm leading-6 text-[#94a3b8]">FIX: Use <span class="mono text-xs">outline:2px solid var(--foreground); outline-offset:2px;</span> on <span class="mono text-xs">:focus-visible</span>.</div>
+</article>
+
+</div>
+</section>
+
+<section class="report-section mb-8 p-6 md:p-8">
+<div class="mono mb-6 text-xs tracking-widest text-[#666]">// CONSIDERED BUT REJECTED</div>
+<div class="overflow-x-auto">
+<table class="w-full min-w-[640px] border-collapse text-sm">
+<thead>
+<tr class="border-b border-[#222226] mono text-left text-xs text-[#666]">
+<th class="py-3 pr-4 font-normal">LOCATION</th>
+<th class="py-3 pr-4 font-normal">CANDIDATE</th>
+<th class="py-3 font-normal">REJECTED BECAUSE</th>
+</tr>
+</thead>
+<tbody class="text-sm text-[#a0a0a0]">
+<tr class="border-b border-[#1a1a1e]"><td class="py-3 pr-4 mono text-xs">src/dashboard.ts:60</td><td class="py-3 pr-4">Equalize grid2 to 1fr/1fr</td><td class="py-3">Asymmetric 1.35/0.85 is correct — requests/latency is primary, doughnut secondary.</td></tr>
+<tr class="border-b border-[#1a1a1e]"><td class="py-3 pr-4 mono text-xs">src/dashboard.ts:88</td><td class="py-3 pr-4">Desaturate status badges</td><td class="py-3">Color is redundant with code + border; hue speeds triage and is allowed.</td></tr>
+<tr class="border-b border-[#1a1a1e]"><td class="py-3 pr-4 mono text-xs">src/dashboard.ts:12</td><td class="py-3 pr-4">Raise radii to 12–16px</td><td class="py-3">6/8px is correct for flat shadcn product register; larger drifts to brand.</td></tr>
+<tr><td class="py-3 pr-4 mono text-xs">src/dashboard.ts:48</td><td class="py-3 pr-4">Narrow wrap to 1024px</td><td class="py-3">9-col tables need 1280px to avoid aggressive truncation.</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<section class="report-section mb-8 p-6 md:p-8">
+<div class="mono mb-6 text-xs tracking-widest text-[#666]">// VERIFICATION</div>
+<div class="grid gap-6 md:grid-cols-2">
+<div>
+<h3 class="mono mb-3 text-xs tracking-widest text-[#555]">CHECKS RUN</h3>
+<ul class="space-y-2 text-sm leading-6 text-[#a0a0a0]">
+<li>✓ Full source read <span class="mono text-xs">src/dashboard.ts:1–346</span> + token audit</li>
+<li>✓ Keyboard focusables audited — windowSel, providerSel, refreshBtn, footer links</li>
+<li>✓ Contrast check <span class="mono text-xs">#71717a on #fafafa ≈4.6:1</span></li>
+<li>✓ Media query audit at 960/640/520 + <span class="mono text-xs">overflow:auto</span> tables</li>
+<li>✓ Form control <span class="mono text-xs">font-size/height</span> audit</li>
+<li>✓ Motion query search — no <span class="mono text-xs">prefers-reduced-motion</span> found</li>
+<li>✓ CDN tag audit + <span class="mono text-xs">bun run build</span> (476 modules, 93ms)</li>
+</ul>
+</div>
+<div>
+<h3 class="mono mb-3 text-xs tracking-widest text-[#555]">NOT VERIFIED</h3>
+<ul class="space-y-2 text-sm leading-6 text-[#666]">
+<li>○ Real VoiceOver/TalkBack walk-through</li>
+<li>○ Real 200% zoom reflow in browser</li>
+<li>○ Lighthouse on throttled 4G</li>
+<li>○ Physical iOS Safari focus-zoom</li>
+</ul>
+</div>
+</div>
+</section>
+
+<footer class="mono py-8 text-center text-xs tracking-widest text-[#444]">Generated with CommandCode — 2026-08-28 · Checkup · 35/60 · Needs changes</footer>
+
+</main>
+</body>
+</html>

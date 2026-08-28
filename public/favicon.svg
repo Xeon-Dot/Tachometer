@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="Tachometer">
+<rect width="32" height="32" rx="7" fill="#18181b"/>
+<g fill="none" stroke="#ffffff" stroke-linecap="round">
+  <path d="M6 20 A10 10 0 0 1 26 20" stroke-width="1.9"/>
+  <path d="M6 20 L7.3 19.15 M16 10 L16 12.3 M26 20 L24.7 19.15 M9.15 13.05 L10.55 13.95 M22.85 13.05 L21.45 13.95" stroke-width="1.55"/>
+</g>
+<g>
+  <line x1="16" y1="20" x2="23.6" y2="13.1" stroke="#ffffff" stroke-width="2.1" stroke-linecap="round"/>
+  <circle cx="16" cy="20" r="2.7" fill="#ffffff"/>
+  <circle cx="16" cy="20" r="2.7" fill="none" stroke="#18181b" stroke-width="0.7"/>
+  <circle cx="16" cy="20" r="1.05" fill="#18181b"/>
+</g>
+</svg>
