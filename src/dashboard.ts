@@ -322,7 +322,7 @@ curl https://tach.cometer/pass/api.some.provider/api/v1/chat/completions ...</pr
 
 <script>
 const fmt = n=> n==null ? '\\u2014' : (typeof n==='number'? (Number.isInteger(n)? n.toLocaleString() : n.toLocaleString()): n);
-const ms = n=> n==null ? '\\u2014' : n + ' ms';
+const ms = n=>{ if(n==null) return '\\u2014'; if(Math.abs(n)>=1000) return (n/1000).toFixed(n>=10000?1:2)+' s'; return n+' ms'; };
 const pct = n=> n==null ? '\\u2014' : n+'%';
 const $ = s=>document.querySelector(s);
 
