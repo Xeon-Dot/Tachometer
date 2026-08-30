@@ -253,6 +253,7 @@ curl https://tach.cometer/pass/api.some.provider/api/v1/chat/completions ...</pr
     <div class="kpi"><div class="skeleton" style="height:11px;width:90px"></div><div class="skeleton" style="height:22px;width:80px;margin-top:12px"></div><div class="skeleton" style="height:12px;width:140px;margin-top:10px"></div></div>
     <div class="kpi"><div class="skeleton" style="height:11px;width:60px"></div><div class="skeleton" style="height:22px;width:80px;margin-top:12px"></div><div class="skeleton" style="height:12px;width:120px;margin-top:10px"></div></div>
     <div class="kpi"><div class="skeleton" style="height:11px;width:70px"></div><div class="skeleton" style="height:22px;width:80px;margin-top:12px"></div><div class="skeleton" style="height:12px;width:160px;margin-top:10px"></div></div>
+    <div class="kpi"><div class="skeleton" style="height:11px;width:80px"></div><div class="skeleton" style="height:22px;width:80px;margin-top:12px"></div><div class="skeleton" style="height:12px;width:140px;margin-top:10px"></div></div>
   </div>
 
   <div class="grid2">
@@ -395,12 +396,14 @@ function renderKpis(summary){
   const el = document.getElementById('kpis');
   if(!el) return;
   el.setAttribute('aria-busy','false');
-  if(!s){ el.innerHTML = '<div class="kpi"><label>아직 데이터 없음</label><strong>\\u2014</strong><small>프록시로 첫 요청을 보내면 여기에 수치가 채워집니다. 위 curl 예시를 그대로 실행해 보세요.</small></div>'; return; }
+  if(!s){ el.innerHTML = '<div class="kpi"><label>아직 데이터 없음</label><strong>\u2014</strong><small>프록시로 첫 요청을 보내면 여기에 수치가 채워집니다. 위 curl 예시를 그대로 실행해 보세요.</small></div>'; return; }
+  const toks = n=> n==null ? '\u2014' : n+' tok/s';
   el.innerHTML = \`
-    <div class="kpi"><label>Total requests</label><strong>\${fmt(s.totalRequests)}</strong><small>성공률 <span>\${pct(s.successRate)}</span> \\u00b7 RPM <span>\${fmt(s.rpm)}</span></small></div>
-    <div class="kpi"><label>Avg latency</label><strong>\${ms(s.latency.avg)}</strong><small>P50 <span>\${ms(s.latency.p50)}</span> \\u00b7 P95 <span>\${ms(s.latency.p95)}</span> \\u00b7 P99 <span>\${ms(s.latency.p99)}</span></small></div>
-    <div class="kpi"><label>TTFT</label><strong>\${ms(s.ttft.avg)}</strong><small>P50 <span>\${ms(s.ttft.p50)}</span> \\u00b7 P95 <span>\${ms(s.ttft.p95)}</span></small></div>
-    <div class="kpi"><label>Tokens</label><strong>\${fmt(s.inputTokens.total + s.outputTokens.total)}</strong><small>In <span>\${fmt(s.inputTokens.total)}</span> \\u00b7 Out <span>\${fmt(s.outputTokens.total)}</span> \\u00b7 Cached <span>\${fmt(s.cachedTokens.total)}</span></small></div>
+    <div class="kpi"><label>Total requests</label><strong>\${fmt(s.totalRequests)}</strong><small>성공률 <span>\${pct(s.successRate)}</span> \u00b7 RPM <span>\${fmt(s.rpm)}</span></small></div>
+    <div class="kpi"><label>Avg latency</label><strong>\${ms(s.latency.avg)}</strong><small>P50 <span>\${ms(s.latency.p50)}</span> \u00b7 P95 <span>\${ms(s.latency.p95)}</span> \u00b7 P99 <span>\${ms(s.latency.p99)}</span></small></div>
+    <div class="kpi"><label>TTFT</label><strong>\${ms(s.ttft.avg)}</strong><small>P50 <span>\${ms(s.ttft.p50)}</span> \u00b7 P95 <span>\${ms(s.ttft.p95)}</span></small></div>
+    <div class="kpi"><label>Tokens</label><strong>\${fmt(s.inputTokens.total + s.outputTokens.total)}</strong><small>In <span>\${fmt(s.inputTokens.total)}</span> \u00b7 Out <span>\${fmt(s.outputTokens.total)}</span> \u00b7 Cached <span>\${fmt(s.cachedTokens.total)}</span></small></div>
+    <div class="kpi"><label>Throughput</label><strong>\${toks(s.tokensPerSec)}</strong><small>Output tokens/sec</small></div>
   \`;
 }
 
