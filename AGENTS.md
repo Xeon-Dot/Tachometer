@@ -12,7 +12,7 @@ bun run build            # bun build → dist/, --target bun
 docker compose up --build
 ```
 
-Env (Bun loads `.env`): `PORT` (3000), `MONGO_URL` or `MONGODB_URI`, `DB_NAME` (`tachometer`). Mongo is optional — connect fails → in-memory store (cap 10_000).
+Env (Bun loads `.env`): `PORT` (3000), `MONGO_URL` or `MONGODB_URI`, `DB_NAME` (`tachometer`), `REQUIRE_MONGO` (`1`/`true`/`yes`/`on` → Mongo 연결 실패 시 서버 시작 자체를 실패, 폴백 없음). Mongo is optional — connect fails → in-memory store (cap 10_000).
 
 ## Layout
 
@@ -39,7 +39,7 @@ Env (Bun loads `.env`): `PORT` (3000), `MONGO_URL` or `MONGODB_URI`, `DB_NAME` (
 - `GET /health` always 200; `db` is `"mongodb"` \| `"memory"` (compose/Dockerfile healthcheck uses this)
 - `GET /healthz` db ping
 - `GET /readyz` **503 in memory mode**
-- `GET /api/stats?window=60` window max 1440 min; includes synthetic provider `__all__`; `modelRankings` sorted by total tokens
+- `GET /api/stats?window=60` window max 1440 min; `window=all` = 전체 시간 (데이터 전체 집계, 응답의 `windowMinutes`는 실제 데이터 스팬 분, `allTime: true`); includes synthetic provider `__all__`; `modelRankings` sorted by total tokens
 - `GET /api/requests?limit=100` limit max 500
 
 ## CI / Docker

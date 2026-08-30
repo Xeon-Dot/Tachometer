@@ -19,6 +19,7 @@ Elysia + Bun + MongoDB 기반 AI API 프록시 성능 계측기.
 bun install
 # MongoDB 없으면 메모리 저장소로 자동 폴백
 MONGO_URL=mongodb://localhost:27017 bun run src/index.ts
+# REQUIRE_MONGO=1 이면 Mongo 미연결 시 서버가 시작되지 않음 (폴백 금지)
 # 또는
 bun run dev
 ```
@@ -27,7 +28,7 @@ bun run dev
 
 - `GET /` 대시보드
 - `GET /health`
-- `GET /api/stats?window=60` 집계 (window 분)
+- `GET /api/stats?window=60` 집계 (window 분, `all` = 전체 시간)
 - `GET /api/requests?limit=100` 최근 요청
 - `ALL /pass/<target-host>/<rest>` 프록시
 

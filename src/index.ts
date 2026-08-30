@@ -66,14 +66,20 @@ app.get("/api/requests", async ({ query }) => {
 })
 
 app.get("/api/stats", async ({ query }) => {
-  const windowMinutes = Math.min(Number((query as any).window || 60), 1440)
-  const bucket = windowMinutes <= 15 ? 1 : windowMinutes <= 60 ? 5 : 15
-  const all = windowMinutes >= 1440 ? await getAll() : await getAllSince(new Date(Date.now() - windowMinutes * 60 * 1000))
+  const raw = (query as any).window
+  const allTime = raw === "all"
+  const requestedMinutes = allTime ? 0 : Math.min(Number(raw || 60), 1440)
+  const all = allTime || requestedMinutes >= 1440 ? await getAll() : await getAllSince(new Date(Date.now() - requestedMinutes * 60 * 1000))
+  const oldest = all.length ? all.reduce((min, m) => Math.min(min, m.timestamp.getTime()), Date.now()) : Date.now()
+  const windowMinutes = allTime ? Math.max(1, Math.floor((Date.now() - oldest) / 60000) + 1) : requestedMinutes
+  const bucket = allTime
+    ? Math.max(15, Math.ceil(windowMinutes / 96 / 15) * 15)
+    : requestedMinutes <= 15 ? 1 : requestedMinutes <= 60 ? 5 : 15
   const summaries = computeSummaries(all, windowMinutes)
   const series = computeTimeSeries(all, bucket, windowMinutes)
   const modelRankings = computeModelRankings(all, windowMinutes)
   const total = summaries.find(s => s.provider === "__all__")?.totalRequests ?? 0
-  return { windowMinutes, bucketMinutes: bucket, total, summaries, series, modelRankings }
+  return { windowMinutes, allTime, bucketMinutes: bucket, total, summaries, series, modelRankings }
 })
 
 const faviconSvg = await Bun.file(new URL("../public/favicon.svg", import.meta.url).pathname).text().catch(() => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="#18181b"/><g fill="none" stroke="#fff" stroke-linecap="round"><path d="M6 20 A10 10 0 0 1 26 20" stroke-width="1.9"/><path d="M6 20 L7.3 19.15 M16 10 L16 12.3 M26 20 L24.7 19.15 M9.15 13.05 L10.55 13.95 M22.85 13.05 L21.45 13.95" stroke-width="1.55"/></g><g><line x1="16" y1="20" x2="23.6" y2="13.1" stroke="#fff" stroke-width="2.1" stroke-linecap="round"/><circle cx="16" cy="20" r="2.7" fill="#fff"/><circle cx="16" cy="20" r="2.7" fill="none" stroke="#18181b" stroke-width=".7"/><circle cx="16" cy="20" r="1.05" fill="#18181b"/></g></svg>`)

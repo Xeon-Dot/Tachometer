@@ -216,6 +216,7 @@ tbody tr:hover td{background:#fafafa}
       <option value="60" selected>최근 60분</option>
       <option value="180">최근 3시간</option>
       <option value="1440">최근 24시간</option>
+      <option value="all">전체 시간</option>
     </select>
     <label class="sr-only" for="providerSel">프로바이더</label>
     <select id="providerSel" class="select" aria-label="프로바이더"><option value="__all__">전체 프로바이더</option></select>
@@ -529,7 +530,7 @@ async function load(opts){
     lastStats = statsRes;
     recentRows = reqRes.requests||[];
     document.getElementById('reqCount').textContent = statsRes.total ?? statsRes.summaries?.find(s=>s.provider==='__all__')?.totalRequests ?? 0;
-    document.getElementById('chartMeta').textContent = \`window \${w}m\`;
+    document.getElementById('chartMeta').textContent = w === 'all' ? '전체 시간' : \`window \${w}m\`;
     renderKpis(statsRes.summaries||[]);
     renderProviders(statsRes.summaries||[]);
     renderModelRankings(statsRes.modelRankings||[]);

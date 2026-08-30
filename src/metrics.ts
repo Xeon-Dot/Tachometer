@@ -132,6 +132,7 @@ export function computeTimeSeries(items: RequestMetric[], bucketMinutes = 5, win
   const windowMs = windowMinutes * 60 * 1000
   const since = now - windowMs
   const buckets = Math.ceil(windowMinutes / bucketMinutes)
+  const labelFrom = windowMinutes > 1440 ? 5 : 11
   const series: { time: string; count: number; avgLatency: number | null; avgTtft: number | null }[] = []
   for (let b = 0; b < buckets; b++) {
     const start = since + b * bucketMinutes * 60 * 1000
@@ -145,7 +146,7 @@ export function computeTimeSeries(items: RequestMetric[], bucketMinutes = 5, win
     const ttfts = slice.map(i => i.ttftMs).filter((v): v is number => v !== null && v > 0)
     const avgTtft = ttfts.length ? Math.round(ttfts.reduce((a, c) => a + c, 0) / ttfts.length) : null
     series.push({
-      time: new Date(start).toISOString().slice(11, 16),
+      time: new Date(start).toISOString().slice(labelFrom, 16).replace("T", " "),
       count: slice.length,
       avgLatency,
       avgTtft,

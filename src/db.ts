@@ -22,6 +22,7 @@ export type RequestMetric = {
 
 const MONGO_URL = process.env.MONGO_URL || process.env.MONGODB_URI || "mongodb://localhost:27017"
 const DB_NAME = process.env.DB_NAME || "tachometer"
+const REQUIRE_MONGO = ["1", "true", "yes", "on"].includes((process.env.REQUIRE_MONGO || "").trim().toLowerCase())
 
 let client: MongoClient | null = null
 let db: Db | null = null
@@ -40,6 +41,10 @@ export async function initDb() {
     await db.collection("requests").createIndex({ timestamp: -1 })
     await db.collection("requests").createIndex({ provider: 1, timestamp: -1 })
   } catch (e) {
+    if (REQUIRE_MONGO) {
+      console.error(`[db] REQUIRE_MONGO is set but mongodb is not reachable (${MONGO_URL}):`, (e as Error).message)
+      throw new Error(`REQUIRE_MONGO is set but mongodb is not reachable at ${MONGO_URL}`)
+    }
     console.warn(`[db] mongodb not available (${MONGO_URL}), using in-memory store:`, (e as Error).message)
     connected = false
     db = null
