@@ -292,7 +292,6 @@ curl https://tacho.xeon.kr/pass/api.anthropic.com/v1/messages \\
 curl https://tacho.xeon.kr/pass/api.some.provider/api/v1/chat/completions ...</pre>
       <button class="copyBtn" id="copyBtn" type="button" aria-label="예시 복사" aria-live="polite"><span id="copyBtnText">복사</span></button>
     </div>
-    <p class="hint" style="margin-top:12px">요청은 그대로 패스스루되며 응답 헤더·바디를 그대로 전달한다. TTFT, 지연시간, 토큰, RPM/TPM이 자동 계측된다. 로컬은 <span class="mono" style="color:var(--foreground)">http://localhost:3000/pass/api.openai.com/...</span></p>
   </section>
 
   <div id="alertSlot" style="margin-top:12px;display:none"></div>
