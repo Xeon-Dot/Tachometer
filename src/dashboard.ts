@@ -3,7 +3,7 @@ export const dashboardHtml = `<!DOCTYPE html>
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<meta name="color-scheme" content="light"/>
+<meta name="color-scheme" content="light dark"/>
 <title>Tachometer — AI API Performance Dashboard</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
 <link rel="icon" href="/favicon.ico" sizes="32x32"/>
@@ -29,15 +29,54 @@ export const dashboardHtml = `<!DOCTYPE html>
   --ring:#18181b;
   --radius:8px;
   --radius-sm:6px;
+  --code-bg:#f4f4f5;
+  --code-fg:#27272a;
+  --table-th-bg:#fafafa;
+  --table-row-hover:#fafafa;
+  --status-2xx-bg:#f0fdf4;--status-2xx-fg:#15803d;--status-2xx-border:#bbf7d0;
+  --status-4xx-bg:#fffbeb;--status-4xx-fg:#b45309;--status-4xx-border:#fde68a;
+  --status-5xx-bg:#fef2f2;--status-5xx-fg:#b91c1c;--status-5xx-border:#fecdd3;
+  --alert-bg:#fef2f2;--alert-fg:#7f1d1d;--alert-border:#fecdd3;
+  --skeleton-2:#ececef;
+  --chart-grid:rgba(228,228,231,1);--chart-tick:#52525b;--chart-bar:#18181b;--chart-line:#71717a;--chart-line-bg:rgba(113,113,122,.08);--chart-doughnut:#18181b,#71717a,#e4e4e7;
+  --btn-hover:#27272a;--btn-ghost-active:#ececef;
+  --shadow-sticky:2px 0 6px rgba(0,0,0,.06);
 }
-html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;scrollbar-gutter:stable;overflow-x:clip}
+html.dark{
+  --bg:#000000;
+  --card:#0a0a0a;
+  --foreground:#fafafa;
+  --muted-fg:#a1a1aa;
+  --muted-fg-soft:#71717a;
+  --muted:#18181b;
+  --border:#27272a;
+  --border-strong:#3f3f46;
+  --primary:#fafafa;
+  --primary-fg:#000000;
+  --ring:#fafafa;
+  --code-bg:#18181b;
+  --code-fg:#d4d4d8;
+  --table-th-bg:#0a0a0a;
+  --table-row-hover:#18181b;
+  --status-2xx-bg:#052e16;--status-2xx-fg:#4ade80;--status-2xx-border:#166534;
+  --status-4xx-bg:#422006;--status-4xx-fg:#fbbf24;--status-4xx-border:#854d0e;
+  --status-5xx-bg:#450a0a;--status-5xx-fg:#f87171;--status-5xx-border:#991b1b;
+  --alert-bg:#450a0a;--alert-fg:#fca5a5;--alert-border:#991b1b;
+  --skeleton-2:#1a1a1a;
+  --chart-grid:rgba(63,63,70,1);--chart-tick:#a1a1aa;--chart-bar:#fafafa;--chart-line:#71717a;--chart-line-bg:rgba(113,113,122,.12);--chart-doughnut:#fafafa,#71717a,#3f3f46;
+  --btn-hover:#3f3f46;--btn-ghost-active:#27272a;
+  --shadow-sticky:2px 0 6px rgba(0,0,0,.4);
+}
+html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;scrollbar-gutter:stable;overflow-x:clip;transition:color-scheme .3s}
+html.dark{color-scheme:dark}
 body{font-family:'JetBrains Mono',ui-monospace,monospace;background:var(--bg);color:var(--foreground);min-height:100vh;line-height:1.5;font-size:14px;overflow-x:clip;max-width:100%}
 .mono{font-family:'JetBrains Mono',ui-monospace,monospace}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 a{color:var(--foreground);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--border-strong);text-decoration-thickness:1px}
 a:hover{text-decoration-color:var(--foreground)}
 a:focus-visible{outline:2px solid var(--ring);outline-offset:2px;border-radius:2px}
-.topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.96);backdrop-filter:saturate(1.2) blur(8px);border-bottom:1px solid var(--border);min-height:56px;padding:max(10px,env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) 10px max(24px, env(safe-area-inset-left));display:flex;align-items:center;justify-content:space-between;gap:16px;transition:transform .25s ease}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(250,250,250,.96);backdrop-filter:saturate(1.2) blur(8px);border-bottom:1px solid var(--border);min-height:56px;padding:max(10px,env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) 10px max(24px, env(safe-area-inset-left));display:flex;align-items:center;justify-content:space-between;gap:16px;transition:transform .25s ease}
+html.dark .topbar{background:rgba(0,0,0,.96)}
 @media(max-width:768px){.topbar--hidden{transform:translateY(-100%)}}
 .brand{display:flex;align-items:center;gap:12px;min-width:0;flex:1 1 auto}
 .logo{width:32px;height:32px;border-radius:6px;background:var(--primary);color:var(--primary-fg);display:grid;place-items:center;font-size:13px;font-weight:700;letter-spacing:-.04em;flex-shrink:0}
@@ -51,8 +90,8 @@ a:focus-visible{outline:2px solid var(--ring);outline-offset:2px;border-radius:2
 .select:focus-visible,.btn:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
 .select:focus{border-color:var(--border-strong)}
 .btn{cursor:pointer;background:var(--primary);color:var(--primary-fg);border-color:var(--primary);font-weight:600;padding:0 14px;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:8px;user-select:none}
-.btn:hover{background:#27272a;border-color:#27272a}
-.btn:active{transform:translateY(0.5px);background:#27272a}
+.btn:hover{background:var(--btn-hover);border-color:var(--btn-hover)}
+.btn:active{transform:translateY(0.5px);background:var(--btn-hover)}
 .btn:disabled{opacity:.52;cursor:not-allowed}
 .btn[aria-busy="true"]{opacity:.88;pointer-events:none}
 .btnSpinner{width:12px;height:12px;border-radius:50%;border:1.5px solid rgba(250,250,250,.35);border-top-color:var(--primary-fg);display:none;flex-shrink:0;animation:spin .65s linear infinite}
@@ -60,7 +99,7 @@ a:focus-visible{outline:2px solid var(--ring);outline-offset:2px;border-radius:2
 .btnLabel{line-height:1}
 .btn-ghost{background:var(--card);color:var(--foreground);border-color:var(--border)}
 .btn-ghost:hover{background:var(--muted);border-color:var(--border-strong)}
-.btn-ghost:active{background:#ececef}
+.btn-ghost:active{background:var(--btn-ghost-active)}
 .select:disabled{opacity:.55;cursor:not-allowed;background-color:var(--muted)}
 .badge{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:500;padding:0 10px;height:32px;border-radius:999px;border:1px solid var(--border);background:var(--card);white-space:nowrap}
 .dot{width:7px;height:7px;border-radius:50%;background:#16a34a;flex-shrink:0;box-shadow:0 0 0 3px rgba(22,163,74,.12)}
@@ -81,7 +120,7 @@ a:focus-visible{outline:2px solid var(--ring);outline-offset:2px;border-radius:2
 .chartBox{position:relative;min-height:180px;margin-top:14px}
 .chartBox canvas{max-width:100%}
 .codeWrap{position:relative}
-.code{font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.65;background:var(--muted);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 44px 14px 14px;overflow-x:auto;white-space:pre;word-break:normal;color:#27272a;scrollbar-width:thin;-webkit-overflow-scrolling:touch;overscroll-behavior-inline:contain;max-width:100%;transition:border-color .15s,box-shadow .15s}
+.code{font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.65;background:var(--code-bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 44px 14px 14px;overflow-x:auto;white-space:pre;word-break:normal;color:var(--code-fg);scrollbar-width:thin;-webkit-overflow-scrolling:touch;overscroll-behavior-inline:contain;max-width:100%;transition:border-color .15s,box-shadow .15s}
 .code:focus-visible{outline:2px solid var(--ring);outline-offset:2px;border-color:var(--border-strong)}
 .code::-webkit-scrollbar{height:6px}
 .copyBtn{position:absolute;inset-block-start:8px;inset-inline-end:8px;height:28px;min-width:28px;padding:0 9px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--foreground);font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:border-color .15s,background .15s,color .15s,transform .08s;isolation:isolate}
@@ -112,15 +151,15 @@ a:focus-visible{outline:2px solid var(--ring);outline-offset:2px;border-radius:2
 .tableWrap:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
 .tableWrap{scrollbar-color:var(--border-strong) transparent}
 table{width:100%;border-collapse:collapse;font-size:12.5px}
-th{text-align:start;padding:10px 12px;color:var(--muted-fg);font-weight:600;white-space:nowrap;border-bottom:1px solid var(--border);background:#fafafa;font-size:11px;letter-spacing:.04em;text-transform:uppercase}
+th{text-align:start;padding:10px 12px;color:var(--muted-fg);font-weight:600;white-space:nowrap;border-bottom:1px solid var(--border);background:var(--table-th-bg);font-size:11px;letter-spacing:.04em;text-transform:uppercase}
 td{padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap}
 tr:last-child td{border-bottom:none}
-@media(hover:hover){tbody tr:hover td{background:#fafafa}}
-tbody tr:focus-within td{background:#fafafa}
+@media(hover:hover){tbody tr:hover td{background:var(--table-row-hover)}}
+tbody tr:focus-within td{background:var(--table-row-hover)}
 .status{padding:3px 7px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid var(--border);display:inline-flex;align-items:center;gap:4px;line-height:1}
-.s2xx{background:#f0fdf4;color:#15803d;border-color:#bbf7d0}
-.s4xx{background:#fffbeb;color:#b45309;border-color:#fde68a}
-.s5xx{background:#fef2f2;color:#b91c1c;border-color:#fecdd3}
+.s2xx{background:var(--status-2xx-bg);color:var(--status-2xx-fg);border-color:var(--status-2xx-border)}
+.s4xx{background:var(--status-4xx-bg);color:var(--status-4xx-fg);border-color:var(--status-4xx-border)}
+.s5xx{background:var(--status-5xx-bg);color:var(--status-5xx-fg);border-color:var(--status-5xx-border)}
 .empty{border:1px dashed var(--border);border-radius:var(--radius);padding:22px 16px;text-align:center;color:var(--muted-fg);font-size:13px;background:var(--card);line-height:1.6}
 .empty strong{color:var(--foreground);font-weight:600}
 .empty .btn{margin-top:12px}
@@ -138,10 +177,10 @@ tbody tr:focus-within td{background:#fafafa}
 .searchWrap:has(input:not(:placeholder-shown)) .searchClear{display:grid}
 .searchWrap:has(input:focus) input{border-color:var(--border-strong)}
 .recentHead{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--border);flex-wrap:wrap}
-.skeleton{background:linear-gradient(90deg, var(--muted) 25%, #ececef 37%, var(--muted) 63%);background-size:400% 100%;animation:shimmer 1.2s ease-in-out infinite;border-radius:6px}
+.skeleton{background:linear-gradient(90deg, var(--muted) 25%, var(--skeleton-2) 37%, var(--muted) 63%);background-size:400% 100%;animation:shimmer 1.2s ease-in-out infinite;border-radius:6px}
 @media(prefers-reduced-motion:reduce){.skeleton{animation:none;background:var(--muted)}}
 @keyframes shimmer{0%{background-position:100% 0} 100%{background-position:-100% 0}}
-.alert{border:1px solid #fecdd3;background:#fef2f2;color:#7f1d1d;border-radius:var(--radius-sm);padding:10px 12px;font-size:12px;line-height:1.5;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.alert{border:1px solid var(--alert-border);background:var(--alert-bg);color:var(--alert-fg);border-radius:var(--radius-sm);padding:10px 12px;font-size:12px;line-height:1.5;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .alert strong{font-weight:600}
 .alertActions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .alert .btn{height:32px;padding:0 12px;font-size:12px;border-radius:6px}
@@ -166,11 +205,11 @@ tbody tr:focus-within td{background:#fafafa}
     inset-inline-start:0;
     z-index:2;
     border-inline-end:1px solid var(--border);
-    box-shadow:2px 0 6px rgba(0,0,0,.06);
+    box-shadow:var(--shadow-sticky);
   }
-  .tableWrap table th:first-child{background:#fafafa}
+  .tableWrap table th:first-child{background:var(--table-th-bg)}
   .tableWrap table td:first-child{background:var(--card)}
-  .tableWrap table tbody tr:hover td:first-child{background:#fafafa}
+  .tableWrap table tbody tr:hover td:first-child{background:var(--table-row-hover)}
   .recentHead{gap:10px}
 }
 @media(max-width:640px){
@@ -241,6 +280,7 @@ tbody tr:focus-within td{background:#fafafa}
 }
 @media(prefers-contrast:more){
   :root{--border:#c9c9cf;--border-strong:#a1a1aa}
+  html.dark{--border:#52525b;--border-strong:#71717a}
   .card,.kpi,.prov,.tableWrap{border-width:1.5px}
 }
 </style>
@@ -256,6 +296,7 @@ tbody tr:focus-within td{background:#fafafa}
     </div>
   </div>
   <div class="controls" role="toolbar" aria-label="대시보드 컨트롤">
+    <button class="btn btn-ghost" id="themeToggle" type="button" aria-label="테마 전환" style="width:40px;padding:0;font-size:16px;line-height:1"><span id="themeIcon">☀</span></button>
     <span class="badge" aria-live="polite" aria-atomic="true"><i class="dot" aria-hidden="true"></i> <span id="liveText">LIVE</span> <span style="color:var(--muted-fg-soft)" aria-hidden="true">·</span> <span id="reqCount" class="mono" style="font-weight:600">—</span><span style="color:var(--muted-fg)">req</span></span>
     <label class="sr-only" for="windowSel">시간 윈도우</label>
     <select id="windowSel" class="select" aria-label="시간 윈도우">
@@ -372,6 +413,37 @@ curl https://tacho.xeon.kr/pass/api.some.provider/api/v1/chat/completions ...</p
 <div id="a11yStatus" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
 <script>
+// Theme toggle
+(function(){
+  const KEY='tacho-theme';
+  const saved=localStorage.getItem(KEY);
+  const prefersDark=matchMedia('(prefers-color-scheme:dark)').matches;
+  const isDark=saved==='dark'||(!saved&&prefersDark);
+  if(isDark) document.documentElement.classList.add('dark');
+  const icon=document.getElementById('themeIcon');
+  function updateIcon(){ icon.textContent=document.documentElement.classList.contains('dark')?'☀':'☾'; }
+  updateIcon();
+  document.getElementById('themeToggle').addEventListener('click',()=>{
+    document.documentElement.classList.toggle('dark');
+    const dark=document.documentElement.classList.contains('dark');
+    localStorage.setItem(KEY,dark?'dark':'light');
+    updateIcon();
+    // Rebuild charts with new colors
+    if(typeof mainChart!=='undefined'&&mainChart){mainChart.destroy();mainChart=undefined;}
+    if(typeof tokenChart!=='undefined'&&tokenChart){tokenChart.destroy();tokenChart=undefined;}
+    if(typeof lastStats!=='undefined'&&lastStats) ensureCharts(lastStats.series||[],lastStats.summaries||[]);
+  });
+  matchMedia('(prefers-color-scheme:dark)').addEventListener('change',e=>{
+    if(!localStorage.getItem(KEY)){
+      if(e.matches) document.documentElement.classList.add('dark');
+      else document.documentElement.classList.remove('dark');
+      updateIcon();
+      if(typeof mainChart!=='undefined'&&mainChart){mainChart.destroy();mainChart=undefined;}
+      if(typeof tokenChart!=='undefined'&&tokenChart){tokenChart.destroy();tokenChart=undefined;}
+      if(typeof lastStats!=='undefined'&&lastStats) ensureCharts(lastStats.series||[],lastStats.summaries||[]);
+    }
+  });
+})();
 const fmt = n=> n==null ? '\\u2014' : (typeof n==='number'? (Number.isInteger(n)? n.toLocaleString() : n.toLocaleString()): n);
 const ms = n=>{ if(n==null) return '\\u2014'; if(Math.abs(n)>=1000) return (n/1000).toFixed(n>=10000?1:2)+' s'; return n+' ms'; };
 const pct = n=> n==null ? '\\u2014' : n+'%';
@@ -418,8 +490,12 @@ function ensureCharts(series, summary){
   const sum = summary.find(s=>s.provider==='__all__');
   const hint = document.getElementById('tokenHint');
   if(hint) hint.textContent = sum ? \`RPM \${sum.rpm} \\u00b7 TPM in \${fmt(sum.tpm.input)} / out \${fmt(sum.tpm.output)} \\u00b7 tokens/sec \${fmt(sum.tokensPerSec)}\` : '\\u2014';
-  const grid = 'rgba(228,228,231,1)';
-  const tick = '#52525b';
+  const cs=getComputedStyle(document.documentElement);
+  const grid=cs.getPropertyValue('--chart-grid').trim()||'rgba(228,228,231,1)';
+  const tick=cs.getPropertyValue('--chart-tick').trim()||'#52525b';
+  const barColor=cs.getPropertyValue('--chart-bar').trim()||'#18181b';
+  const lineColor=cs.getPropertyValue('--chart-line').trim()||'#71717a';
+  const lineBg=cs.getPropertyValue('--chart-line-bg').trim()||'rgba(113,113,122,.08)';
   const common = chartDefaults();
   const tokenData = [sum?sum.inputTokens.total:0, sum?sum.outputTokens.total:0, sum?sum.cachedTokens.total:0];
   if(mainChart){
@@ -431,8 +507,8 @@ function ensureCharts(series, summary){
     mainChart = new Chart(ctx1, {
       type:'bar',
       data:{labels, datasets:[
-        {label:'Requests', data:counts, yAxisID:'y', backgroundColor:'#18181b', borderRadius:4, borderSkipped:false, barThickness:10, maxBarThickness:14},
-        {label:'Avg latency (ms)', data:lat, yAxisID:'y1', type:'line', borderColor:'#71717a', backgroundColor:'rgba(113,113,122,.08)', tension:.35, pointRadius:0, pointHoverRadius:3, borderWidth:1.5}
+        {label:'Requests', data:counts, yAxisID:'y', backgroundColor:barColor, borderRadius:4, borderSkipped:false, barThickness:10, maxBarThickness:14},
+        {label:'Avg latency (ms)', data:lat, yAxisID:'y1', type:'line', borderColor:lineColor, backgroundColor:lineBg, tension:.35, pointRadius:0, pointHoverRadius:3, borderWidth:1.5}
       ]},
       options:{
         ...common,
@@ -446,7 +522,7 @@ function ensureCharts(series, summary){
       }
     });
   }
-  const doughnutColors = ['#18181b','#71717a','#e4e4e7'];
+  const doughnutColors=(cs.getPropertyValue('--chart-doughnut').trim()||'#18181b,#71717a,#e4e4e7').split(',');
   if(tokenChart){
     tokenChart.data.datasets[0].data = tokenData;
     tokenChart.update('none');
