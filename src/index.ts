@@ -26,7 +26,7 @@ app.get("/healthz", async () => {
       const { getCollection } = await import("./db")
       const col = getCollection()
       const t0 = Date.now()
-      await col!.findOne({}, { projection: { _id: 1 } })
+      await col?.findOne({}, { projection: { _id: 1 } })
       dbLatencyMs = Date.now() - t0
       dbStatus = "ok"
     } catch {
@@ -44,14 +44,14 @@ app.get("/healthz", async () => {
   }
 })
 
-app.get("/readyz", async ({ set }: any) => {
+app.get("/readyz", async ({ set }: unknown) => {
   if (!isDbConnected()) {
     set.status = 503
     return { ok: false, ready: false, db: "memory", reason: "db not connected (running in memory mode)" }
   }
   try {
     const { getCollection } = await import("./db")
-    await getCollection()!.findOne({}, { projection: { _id: 1 } })
+    await getCollection()?.findOne({}, { projection: { _id: 1 } })
     return { ok: true, ready: true, db: "ok" }
   } catch (e) {
     set.status = 503
@@ -60,13 +60,13 @@ app.get("/readyz", async ({ set }: any) => {
 })
 
 app.get("/api/requests", async ({ query }) => {
-  const limit = Math.min(Number((query as any).limit || 100), 500)
+  const limit = Math.min(Number((query as unknown).limit || 100), 500)
   const requests = await getRecent(limit)
   return { requests }
 })
 
 app.get("/api/stats", async ({ query }) => {
-  const raw = (query as any).window
+  const raw = (query as unknown).window
   const allTime = raw === "all"
   const requestedMinutes = allTime ? 0 : Math.min(Number(raw || 60), 1440)
   const all = allTime || requestedMinutes >= 1440 ? await getAll() : await getAllSince(new Date(Date.now() - requestedMinutes * 60 * 1000))

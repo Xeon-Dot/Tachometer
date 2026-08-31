@@ -93,7 +93,7 @@ export function computeModelRankings(items: RequestMetric[], windowMinutes = 60)
   for (const m of recent) {
     const key = m.model || "(unknown)"
     if (!groups.has(key)) groups.set(key, [])
-    groups.get(key)!.push(m)
+    groups.get(key)?.push(m)
   }
   const rankings: ModelRanking[] = []
   for (const [model, group] of groups) {
@@ -116,7 +116,7 @@ export function computeSummaries(items: RequestMetric[], windowMinutes = 60): Pr
   const groups = new Map<string, RequestMetric[]>()
   for (const m of recent) {
     if (!groups.has(m.provider)) groups.set(m.provider, [])
-    groups.get(m.provider)!.push(m)
+    groups.get(m.provider)?.push(m)
   }
   const overall: RequestMetric[] = recent
   const result: ProviderSummary[] = []

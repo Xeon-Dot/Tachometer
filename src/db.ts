@@ -1,7 +1,7 @@
 import { MongoClient, Db, Collection } from "mongodb"
 
 export type RequestMetric = {
-  _id?: any
+  _id?: unknown
   provider: string
   path: string
   method: string
@@ -61,7 +61,7 @@ export function getCollection(): Collection<RequestMetric> | null {
 export async function insertMetric(m: RequestMetric) {
   const col = getCollection()
   if (col) {
-    try { await col.insertOne(m as any); return } catch {}
+    try { await col.insertOne(m as unknown); return } catch {}
   }
   memoryStore.push(m)
   if (memoryStore.length > 10000) memoryStore.shift()
@@ -70,7 +70,7 @@ export async function insertMetric(m: RequestMetric) {
 export async function getRecent(limit = 100): Promise<RequestMetric[]> {
   const col = getCollection()
   if (col) {
-    try { return await col.find().sort({ timestamp: -1 }).limit(limit).toArray() as any }
+    try { return await col.find().sort({ timestamp: -1 }).limit(limit).toArray() as unknown }
     catch {}
   }
   return [...memoryStore].sort((a,b)=> b.timestamp.getTime() - a.timestamp.getTime()).slice(0, limit)
@@ -79,7 +79,7 @@ export async function getRecent(limit = 100): Promise<RequestMetric[]> {
 export async function getAllSince(since: Date): Promise<RequestMetric[]> {
   const col = getCollection()
   if (col) {
-    try { return await col.find({ timestamp: { $gte: since } }).toArray() as any } catch {}
+    try { return await col.find({ timestamp: { $gte: since } }).toArray() as unknown } catch {}
   }
   return memoryStore.filter(m => m.timestamp >= since)
 }
@@ -87,7 +87,7 @@ export async function getAllSince(since: Date): Promise<RequestMetric[]> {
 export async function getAll(): Promise<RequestMetric[]> {
   const col = getCollection()
   if (col) {
-    try { return await col.find().toArray() as any } catch {}
+    try { return await col.find().toArray() as unknown } catch {}
   }
   return [...memoryStore]
 }

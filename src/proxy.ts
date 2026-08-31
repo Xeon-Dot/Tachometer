@@ -10,7 +10,7 @@ export function extractProvider(pathname: string): { host: string | null; rest: 
   return { host, rest }
 }
 
-function parseTokensFromJson(obj: any): { inputTokens: number | null; outputTokens: number | null; cachedTokens: number | null; totalTokens: number | null; model: string | null } {
+function parseTokensFromJson(obj: unknown): { inputTokens: number | null; outputTokens: number | null; cachedTokens: number | null; totalTokens: number | null; model: string | null } {
   if (!obj || typeof obj !== "object") return { inputTokens: null, outputTokens: null, cachedTokens: null, totalTokens: null, model: null }
   let inputTokens: number | null = null
   let outputTokens: number | null = null
@@ -47,7 +47,7 @@ function parseTokensFromJson(obj: any): { inputTokens: number | null; outputToke
   return { inputTokens, outputTokens, cachedTokens, totalTokens, model }
 }
 
-function tryParseJson(text: string): any | null {
+function tryParseJson(text: string): unknown | null {
   try { return JSON.parse(text) } catch { return null }
 }
 
@@ -130,10 +130,10 @@ export async function handleProxy(request: Request): Promise<Response> {
     upstream = await fetch(targetUrl, {
       method: request.method,
       headers: forwardHeaders,
-      body: body as any,
+      body: body as unknown,
       redirect: "manual",
-    } as any)
-  } catch (e: any) {
+    } as unknown)
+  } catch (e: unknown) {
     const latencyMs = Math.round(performance.now() - start)
     await insertMetric({
       provider: host,
@@ -210,7 +210,7 @@ export async function handleProxy(request: Request): Promise<Response> {
 
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
-      const reader = upstream.body!.getReader()
+      const reader = upstream.body?.getReader()
       try {
         while (true) {
           const { done, value } = await reader.read()
