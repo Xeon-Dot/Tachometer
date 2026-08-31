@@ -702,7 +702,15 @@ async function load(opts){
 }
 
 document.getElementById('refreshBtn').addEventListener('click', ()=> load({manual:true}));
-document.getElementById('windowSel').addEventListener('change', ()=> load({manual:true}));
+document.getElementById('windowSel').addEventListener('change', ()=>{
+  const ws = document.getElementById('windowSel');
+  if(ws){
+    const u = new URL(location.href);
+    u.searchParams.set('window', ws.value);
+    history.replaceState(null, '', u.toString());
+  }
+  load({manual:true});
+});
 const recentSearchEl = document.getElementById('recentSearch');
 const recentSearchClearEl = document.getElementById('recentSearchClear');
 if(recentSearchEl) recentSearchEl.addEventListener('input', ()=> renderRecent(filteredRecent()));
@@ -759,6 +767,18 @@ if(exampleCodeEl){
     }
   });
 }
+
+// Read ?window= from URL on load
+(function(){
+  const u = new URL(location.href);
+  const w = u.searchParams.get('window');
+  if(w){
+    const ws = document.getElementById('windowSel');
+    if(ws && Array.from(ws.options).some(o=>o.value===w)){
+      ws.value = w;
+    }
+  }
+})();
 
 function waitForChart(cb){
   if(typeof Chart !== 'undefined') cb();
