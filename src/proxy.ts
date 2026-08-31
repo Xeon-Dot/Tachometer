@@ -67,11 +67,11 @@ function extractFromSseBuffer(buffer: string) {
     if (!jsonStr || jsonStr === "[DONE]") continue
     const obj = tryParseJson(jsonStr)
     if (!obj) continue
-    const inner = obj.usage ?? obj.message?.usage ?? obj.response?.usage ?? obj
-    const parsed = parseTokensFromJson(obj.message ?? obj.delta ?? obj.response ?? obj)
-    const parsed2 = parseTokensFromJson(obj)
-    const parsed3 = inner ? parseTokensFromJson({ usage: inner, model: obj.model }) : null
-    for (const p of [parsed, parsed2, parsed3]) {
+    const candidates = [
+      parseTokensFromJson(obj.message ?? obj.delta ?? obj.response ?? obj),
+      parseTokensFromJson(obj),
+    ]
+    for (const p of candidates) {
       if (!p) continue
       if (p.inputTokens !== null) inputTokens = p.inputTokens
       if (p.outputTokens !== null) outputTokens = p.outputTokens

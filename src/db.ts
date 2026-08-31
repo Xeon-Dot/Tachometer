@@ -28,7 +28,7 @@ let client: MongoClient | null = null
 let db: Db | null = null
 let connected = false
 
-export const memoryStore: RequestMetric[] = []
+const memoryStore: RequestMetric[] = []
 
 export async function initDb() {
   try {

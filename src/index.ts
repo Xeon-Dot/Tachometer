@@ -1,5 +1,5 @@
 import { Elysia } from "elysia"
-import { initDb, getRecent, getAll, getAllSince, isDbConnected } from "./db"
+import { initDb, getCollection, getRecent, getAll, getAllSince, isDbConnected } from "./db"
 import { computeSummaries, computeTimeSeries, computeModelRankings } from "./metrics"
 import { handleProxy } from "./proxy"
 import { dashboardHtml } from "./dashboard"
@@ -23,7 +23,6 @@ app.get("/healthz", async () => {
   let dbLatencyMs: number | null = null
   if (isDbConnected()) {
     try {
-      const { getCollection } = await import("./db")
       const col = getCollection()
       const t0 = Date.now()
       await col?.findOne({}, { projection: { _id: 1 } })
@@ -50,7 +49,6 @@ app.get("/readyz", async ({ set }: unknown) => {
     return { ok: false, ready: false, db: "memory", reason: "db not connected (running in memory mode)" }
   }
   try {
-    const { getCollection } = await import("./db")
     await getCollection()?.findOne({}, { projection: { _id: 1 } })
     return { ok: true, ready: true, db: "ok" }
   } catch (e) {
@@ -103,5 +101,3 @@ app.listen({ port: PORT, hostname: "0.0.0.0" }, () => {
   console.log(`[tachometer] proxy: http://0.0.0.0:${PORT}/pass/<target-host>/<path>  e.g. /pass/api.openai.com/v1/responses`)
   console.log(`[tachometer] dashboard: http://0.0.0.0:${PORT}/`)
 })
-
-export type App = typeof app
