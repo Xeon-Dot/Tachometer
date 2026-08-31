@@ -37,7 +37,8 @@ body{font-family:'JetBrains Mono',ui-monospace,monospace;background:var(--bg);co
 a{color:var(--foreground);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--border-strong);text-decoration-thickness:1px}
 a:hover{text-decoration-color:var(--foreground)}
 a:focus-visible{outline:2px solid var(--ring);outline-offset:2px;border-radius:2px}
-.topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.96);backdrop-filter:saturate(1.2) blur(8px);border-bottom:1px solid var(--border);min-height:56px;padding:max(10px,env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) 10px max(24px, env(safe-area-inset-left));display:flex;align-items:center;justify-content:space-between;gap:16px}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.96);backdrop-filter:saturate(1.2) blur(8px);border-bottom:1px solid var(--border);min-height:56px;padding:max(10px,env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) 10px max(24px, env(safe-area-inset-left));display:flex;align-items:center;justify-content:space-between;gap:16px;transition:transform .25s ease}
+@media(max-width:768px){.topbar--hidden{transform:translateY(-100%)}}
 .brand{display:flex;align-items:center;gap:12px;min-width:0;flex:1 1 auto}
 .logo{width:32px;height:32px;border-radius:6px;background:var(--primary);color:var(--primary-fg);display:grid;place-items:center;font-size:13px;font-weight:700;letter-spacing:-.04em;flex-shrink:0}
 .brand h1{font-size:15px;font-weight:700;letter-spacing:-.03em;line-height:1}
@@ -696,6 +697,22 @@ function startPolling(){
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', startPolling);
 else startPolling();
+
+// ponytail: hide topbar on scroll-down, show on scroll-up (mobile only)
+(function(){
+  const topbar = document.querySelector('.topbar');
+  if(!topbar || matchMedia('(min-width:769px)').matches || reducedMotion) return;
+  let lastY = 0, ticking = false;
+  addEventListener('scroll', ()=>{
+    if(ticking) return; ticking = true;
+    requestAnimationFrame(()=>{
+      const y = scrollY;
+      if(y > 56 && y - lastY > 4) topbar.classList.add('topbar--hidden');
+      else if(y < lastY - 4 || y <= 0) topbar.classList.remove('topbar--hidden');
+      lastY = y; ticking = false;
+    });
+  }, {passive:true});
+})();
 </script>
 </body>
 </html>`
