@@ -85,40 +85,20 @@ export async function insertMetric(m: RequestMetric) {
   if (memoryStore.length > 10000) memoryStore.shift();
 }
 
-export async function getRecent(limit = 100): Promise<RequestMetric[]> {
+export async function queryMetrics(
+  opts: { since?: Date; limit?: number } = {},
+): Promise<RequestMetric[]> {
   const col = getCollection();
   if (col) {
     try {
-      return (await col
-        .find()
-        .sort({ timestamp: -1 })
-        .limit(limit)
-        .toArray()) as unknown;
+      const q = opts.since ? { timestamp: { $gte: opts.since } } : {};
+      let cur = col.find(q as never).sort({ timestamp: -1 });
+      if (opts.limit) cur = cur.limit(opts.limit);
+      return (await cur.toArray()) as unknown as RequestMetric[];
     } catch {}
   }
-  return [...memoryStore]
-    .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
-    .slice(0, limit);
-}
-
-export async function getAllSince(since: Date): Promise<RequestMetric[]> {
-  const col = getCollection();
-  if (col) {
-    try {
-      return (await col
-        .find({ timestamp: { $gte: since } })
-        .toArray()) as unknown;
-    } catch {}
-  }
-  return memoryStore.filter((m) => m.timestamp >= since);
-}
-
-export async function getAll(): Promise<RequestMetric[]> {
-  const col = getCollection();
-  if (col) {
-    try {
-      return (await col.find().toArray()) as unknown;
-    } catch {}
-  }
-  return [...memoryStore];
+  let rows = [...memoryStore];
+  if (opts.since) rows = rows.filter((m) => m.timestamp >= opts.since!);
+  rows.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  return opts.limit ? rows.slice(0, opts.limit) : rows;
 }

@@ -71,20 +71,9 @@ function buildSummary(
   const countWithInput = items.filter((i) => i.inputTokens !== null).length;
   const countWithOutput = items.filter((i) => i.outputTokens !== null).length;
   const totalLatencySec = latencies.reduce((a, b) => a + b, 0) / 1000;
-  const rpm =
-    windowMinutes > 0 ? Math.round((total / windowMinutes) * 100) / 100 : 0;
-  const tpmInput =
-    windowMinutes > 0
-      ? Math.round((inputTotal / windowMinutes) * 100) / 100
-      : 0;
-  const tpmOutput =
-    windowMinutes > 0
-      ? Math.round((outputTotal / windowMinutes) * 100) / 100
-      : 0;
-  const tpmTotal =
-    windowMinutes > 0
-      ? Math.round((totalTokensForRate / windowMinutes) * 100) / 100
-      : 0;
+  const rate = (n: number) =>
+    windowMinutes > 0 ? Math.round((n / windowMinutes) * 100) / 100 : 0;
+  const rpm = rate(total);
   const tps =
     totalLatencySec > 0 && outputTotal > 0
       ? Math.round((outputTotal / totalLatencySec) * 100) / 100
@@ -115,7 +104,11 @@ function buildSummary(
     },
     cachedTokens: { total: cachedTotal },
     rpm,
-    tpm: { input: tpmInput, output: tpmOutput, total: tpmTotal },
+    tpm: {
+      input: rate(inputTotal),
+      output: rate(outputTotal),
+      total: rate(totalTokensForRate),
+    },
     tokensPerSec: tps,
   };
 }
@@ -131,15 +124,9 @@ export type ModelRanking = {
   providers: string[];
 };
 
-export function computeModelRankings(
-  items: RequestMetric[],
-  windowMinutes = 60,
-): ModelRanking[] {
-  const now = Date.now();
-  const windowMs = windowMinutes * 60 * 1000;
-  const recent = items.filter((i) => now - i.timestamp.getTime() <= windowMs);
+export function computeModelRankings(items: RequestMetric[]): ModelRanking[] {
   const groups = new Map<string, RequestMetric[]>();
-  for (const m of recent) {
+  for (const m of items) {
     const key = m.model || "(unknown)";
     if (!groups.has(key)) groups.set(key, []);
     groups.get(key)?.push(m);
@@ -177,15 +164,12 @@ export function computeSummaries(
   items: RequestMetric[],
   windowMinutes = 60,
 ): ProviderSummary[] {
-  const now = Date.now();
-  const windowMs = windowMinutes * 60 * 1000;
-  const recent = items.filter((i) => now - i.timestamp.getTime() <= windowMs);
   const groups = new Map<string, RequestMetric[]>();
-  for (const m of recent) {
+  for (const m of items) {
     if (!groups.has(m.provider)) groups.set(m.provider, []);
     groups.get(m.provider)?.push(m);
   }
-  const overall: RequestMetric[] = recent;
+  const overall: RequestMetric[] = items;
   const result: ProviderSummary[] = [];
   if (overall.length)
     result.push(buildSummary("__all__", overall, windowMinutes));
@@ -195,16 +179,11 @@ export function computeSummaries(
   return result;
 }
 
-export function computeTimeSeries(
-  items: RequestMetric[],
-  bucketMinutes = 5,
-  windowMinutes = 60,
-) {
+export function computeTimeSeries(items: RequestMetric[], windowMinutes = 60) {
+  const bucketMinutes = 5;
   const now = Date.now();
-  const windowMs = windowMinutes * 60 * 1000;
-  const since = now - windowMs;
+  const since = now - windowMinutes * 60 * 1000;
   const buckets = Math.ceil(windowMinutes / bucketMinutes);
-  const labelFrom = windowMinutes > 1440 ? 5 : 11;
   const series: {
     time: string;
     count: number;
@@ -229,10 +208,7 @@ export function computeTimeSeries(
       ? Math.round(ttfts.reduce((a, c) => a + c, 0) / ttfts.length)
       : null;
     series.push({
-      time: new Date(start)
-        .toISOString()
-        .slice(labelFrom, 16)
-        .replace("T", " "),
+      time: new Date(start).toISOString().slice(11, 16).replace("T", " "),
       count: slice.length,
       avgLatency,
       avgTtft,

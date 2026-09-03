@@ -122,13 +122,6 @@ html.dark .topbar{background:rgba(0,0,0,.96)}
 .code{font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.65;background:var(--code-bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 44px 14px 14px;overflow-x:auto;white-space:pre;word-break:normal;color:var(--code-fg);scrollbar-width:thin;-webkit-overflow-scrolling:touch;overscroll-behavior-inline:contain;max-width:100%;transition:border-color .15s,box-shadow .15s}
 .code:focus-visible{outline:2px solid var(--ring);outline-offset:2px;border-color:var(--border-strong)}
 .code::-webkit-scrollbar{height:6px}
-.copyBtn{position:absolute;inset-block-start:8px;inset-inline-end:8px;height:28px;min-width:28px;padding:0 9px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--foreground);font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:border-color .15s,background .15s,color .15s,transform .08s;isolation:isolate}
-.copyBtn::before{content:"";position:absolute;inset:-8px;border-radius:10px}
-.copyBtn:hover{background:var(--foreground);color:var(--card);border-color:var(--foreground)}
-.copyBtn:active{transform:translateY(0.5px)}
-.copyBtn:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
-.copyBtn[data-copied="true"]{background:var(--foreground);color:var(--card);border-color:var(--foreground)}
-.copyBtn:disabled{opacity:.6;cursor:not-allowed}
 .hint{color:var(--muted-fg);font-size:12px;line-height:1.6;overflow-wrap:anywhere}
 .section-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:28px 0 10px;flex-wrap:wrap}
 .section-head h3{font-size:13px;font-weight:600;letter-spacing:-.02em}
@@ -163,18 +156,6 @@ tbody tr:focus-within td{background:var(--table-row-hover)}
 .empty strong{color:var(--foreground);font-weight:600}
 .empty .btn{margin-top:12px}
 .inline-meta{font-size:11px;color:var(--muted-fg);font-weight:500;overflow-wrap:anywhere}
-.searchWrap{position:relative;display:flex;align-items:center;flex:0 1 auto}
-.searchWrap input{height:36px;border:1px solid var(--border);border-radius:var(--radius-sm);padding-block:0;padding-inline-start:30px;padding-inline-end:28px;font-size:13px;width:220px;max-width:100%;background:var(--card);outline:none;transition:border-color .15s,box-shadow .15s,background .15s;touch-action:manipulation}
-.searchWrap input::placeholder{color:var(--muted-fg-soft)}
-.searchWrap input:hover{border-color:var(--border-strong)}
-.searchWrap input:focus{border-color:var(--border-strong)}
-.searchWrap input:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
-.searchIcon{position:absolute;inset-inline-start:9px;color:var(--muted-fg-soft);pointer-events:none;font-size:12px}
-.searchClear{position:absolute;inset-inline-end:6px;width:22px;height:22px;border-radius:50%;border:1px solid transparent;background:transparent;color:var(--muted-fg);display:none;place-items:center;font-size:12px;line-height:1;cursor:pointer;touch-action:manipulation}
-.searchClear:hover{background:var(--muted);border-color:var(--border);color:var(--foreground)}
-.searchClear:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
-.searchWrap:has(input:not(:placeholder-shown)) .searchClear{display:grid}
-.searchWrap:has(input:focus) input{border-color:var(--border-strong)}
 .recentHead{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--border);flex-wrap:wrap}
 .skeleton{background:linear-gradient(90deg, var(--muted) 25%, var(--skeleton-2) 37%, var(--muted) 63%);background-size:400% 100%;animation:shimmer 1.2s ease-in-out infinite;border-radius:6px}
 @media(prefers-reduced-motion:reduce){.skeleton{animation:none;background:var(--muted)}}
@@ -183,11 +164,7 @@ tbody tr:focus-within td{background:var(--table-row-hover)}
 .alert strong{font-weight:600}
 .alertActions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .alert .btn{height:32px;padding:0 12px;font-size:12px;border-radius:6px}
-.toastHost{position:fixed;inset-inline:0;bottom:calc(16px + env(safe-area-inset-bottom));display:flex;justify-content:center;pointer-events:none;z-index:40;padding:0 16px}
-.toast{background:var(--primary);color:var(--primary-fg);font-size:12px;font-weight:600;padding:10px 14px;border-radius:999px;border:1px solid var(--primary);box-shadow:0 10px 24px rgba(0,0,0,.18);opacity:0;transform:translateY(6px);transition:opacity .18s,transform .18s;max-width:min(92vw,420px);text-align:center}
-.toast[data-show="true"]{opacity:1;transform:translateY(0)}
-@media(prefers-reduced-motion:reduce){.toast{transition:none}}
-
+@media(prefers-reduced-motion:reduce){
 @media(max-width:1024px){
   .wrap{max-width:100%}
   .grid2{grid-template-columns:1fr;gap:14px}
@@ -203,11 +180,8 @@ tbody tr:focus-within td{background:var(--table-row-hover)}
   .controls .btn{grid-column:1 / -1;width:100%;height:44px;justify-content:center}
   .wrap{padding:16px max(16px, env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left))}
   table{font-size:12px} th,td{padding:9px 10px}
-  .searchWrap{width:100%}
-  .searchWrap input{font-size:16px;height:44px;width:100%}
-  .code{font-size:11px;padding:12px 48px 12px 12px}
-  .copyBtn{height:36px;min-width:44px}
-  .card{padding:16px}
+      .code{font-size:11px;padding:12px 48px 12px 12px}
+    .card{padding:16px}
   .chartBox{min-height:200px}
   .kpis{grid-template-columns:1fr;gap:12px}
   .section-head{margin:20px 0 10px}
@@ -240,7 +214,6 @@ tbody tr:focus-within td{background:var(--table-row-hover)}
     </div>
   </div>
   <div class="controls" role="toolbar" aria-label="대시보드 컨트롤">
-    <button class="btn btn-ghost" id="themeToggle" type="button" aria-label="테마 전환" style="width:40px;padding:0;font-size:16px;line-height:1"><span id="themeIcon">☀</span></button>
     <span class="badge" aria-live="polite" aria-atomic="true"><i class="dot" aria-hidden="true"></i> <span id="liveText">LIVE</span> <span style="color:var(--muted-fg-soft)" aria-hidden="true">·</span> <span id="reqCount" class="mono" style="font-weight:600">—</span><span style="color:var(--muted-fg)">req</span></span>
     <label class="sr-only" for="windowSel">시간 윈도우</label>
     <select id="windowSel" class="select" aria-label="시간 윈도우">
@@ -251,8 +224,6 @@ tbody tr:focus-within td{background:var(--table-row-hover)}
       <option value="1440">최근 24시간</option>
       <option value="all">전체 시간</option>
     </select>
-    <label class="sr-only" for="providerSel">프로바이더</label>
-    <select id="providerSel" class="select" aria-label="프로바이더"><option value="__all__">전체 프로바이더</option></select>
     <button class="btn" id="refreshBtn" type="button" aria-label="새로고침"><span class="btnSpinner" aria-hidden="true"></span><span class="btnLabel">새로고침</span></button>
   </div>
 </div>
@@ -275,11 +246,10 @@ curl https://tacho.xeon.kr/pass/api.anthropic.com/v1/messages \\
 
 # 임의 프로바이더도 동일 패턴
 curl https://tacho.xeon.kr/pass/api.some.provider/api/v1/chat/completions ...</pre>
-      <button class="copyBtn" id="copyBtn" type="button" aria-label="예시 복사" aria-live="polite"><span id="copyBtnText">복사</span></button>
     </div>
   </section>
 
-  <div id="alertSlot" style="margin-top:12px;display:none"></div>
+  <div style="margin-top:12px;display:none"></div>
 
   <div class="kpis" id="kpis" aria-live="polite" aria-atomic="true" aria-busy="true">
     <div class="kpi"><div class="skeleton" style="height:11px;width:90px"></div><div class="skeleton" style="height:22px;width:80px;margin-top:12px"></div><div class="skeleton" style="height:12px;width:140px;margin-top:10px"></div></div>
@@ -325,11 +295,6 @@ curl https://tacho.xeon.kr/pass/api.some.provider/api/v1/chat/completions ...</p
     <div class="recentHead">
       <h3 style="margin:0;flex:0 0 auto">최근 요청 <span style="color:var(--muted-fg);font-weight:400" id="recentMeta"></span></h3>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-width:0;flex:1 1 220px;justify-content:flex-end">
-        <label class="searchWrap" aria-label="최근 요청 검색">
-          <span class="searchIcon" aria-hidden="true">⌕</span>
-          <input id="recentSearch" type="search" placeholder="provider, path, model 검색" autocomplete="off" spellcheck="false" aria-label="최근 요청 검색" enterkeyhint="search"/>
-          <button class="searchClear" id="recentSearchClear" type="button" aria-label="검색어 지우기" tabindex="-1">×</button>
-        </label>
         <span class="mono inline-meta" style="white-space:nowrap">최근 100개</span>
       </div>
     </div>
@@ -351,41 +316,8 @@ curl https://tacho.xeon.kr/pass/api.some.provider/api/v1/chat/completions ...</p
     <a href="/health">/health</a>
   </div>
 </main>
-<div class="toastHost" aria-live="polite" aria-atomic="true"><div id="toast" class="toast" role="status" data-show="false"></div></div>
-<div id="a11yStatus" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
 <script>
-// Theme toggle
-(function(){
-  const KEY='tacho-theme';
-  const saved=localStorage.getItem(KEY);
-  const prefersDark=matchMedia('(prefers-color-scheme:dark)').matches;
-  const isDark=saved==='dark'||(!saved&&prefersDark);
-  if(isDark) document.documentElement.classList.add('dark');
-  const icon=document.getElementById('themeIcon');
-  function updateIcon(){ icon.textContent=document.documentElement.classList.contains('dark')?'☀':'☾'; }
-  updateIcon();
-  document.getElementById('themeToggle').addEventListener('click',()=>{
-    document.documentElement.classList.toggle('dark');
-    const dark=document.documentElement.classList.contains('dark');
-    localStorage.setItem(KEY,dark?'dark':'light');
-    updateIcon();
-    // Rebuild charts with new colors
-    if(typeof mainChart!=='undefined'&&mainChart){mainChart.destroy();mainChart=undefined;}
-    if(typeof tokenChart!=='undefined'&&tokenChart){tokenChart.destroy();tokenChart=undefined;}
-    if(typeof lastStats!=='undefined'&&lastStats) ensureCharts(lastStats.series||[],lastStats.summaries||[]);
-  });
-  matchMedia('(prefers-color-scheme:dark)').addEventListener('change',e=>{
-    if(!localStorage.getItem(KEY)){
-      if(e.matches) document.documentElement.classList.add('dark');
-      else document.documentElement.classList.remove('dark');
-      updateIcon();
-      if(typeof mainChart!=='undefined'&&mainChart){mainChart.destroy();mainChart=undefined;}
-      if(typeof tokenChart!=='undefined'&&tokenChart){tokenChart.destroy();tokenChart=undefined;}
-      if(typeof lastStats!=='undefined'&&lastStats) ensureCharts(lastStats.series||[],lastStats.summaries||[]);
-    }
-  });
-})();
 const fmt = n=> n==null ? '\\u2014' : (typeof n==='number'? (Number.isInteger(n)? n.toLocaleString() : n.toLocaleString()): n);
 const ms = n=>{ if(n==null) return '\\u2014'; if(Math.abs(n)>=1000) return (n/1000).toFixed(n>=10000?1:2)+' s'; return n+' ms'; };
 const pct = n=> n==null ? '\\u2014' : n+'%';
@@ -393,25 +325,8 @@ const $ = s=>document.querySelector(s);
 
 let mainChart, tokenChart;
 let recentRows = [];
-let lastStats = null;
 const reducedMotion = typeof window.matchMedia==='function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-let toastTimer = 0;
-let copyTimer = 0;
 
-function announce(msg){
-  const el = document.getElementById('a11yStatus');
-  if(!el) return;
-  el.textContent = '';
-  requestAnimationFrame(()=>{ el.textContent = msg; });
-}
-function showToast(msg){
-  const el = document.getElementById('toast');
-  if(!el) return;
-  el.textContent = msg;
-  el.dataset.show = 'true';
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=>{ el.dataset.show='false'; }, 2200);
-}
 
 function chartDefaults(){
   return {
@@ -495,22 +410,6 @@ function renderKpis(summary){
 
 function renderProviders(summaries){
   const wrap = document.getElementById('providers');
-  const sel = document.getElementById('providerSel');
-  const meta = document.getElementById('providerMeta');
-  const list = summaries.filter(s=>s.provider!=='__all__');
-  const cur = sel.value;
-  const nextSig = list.map(s=>s.provider).join('|');
-  const isFocused = document.activeElement === sel;
-  if(sel.dataset.sig !== nextSig && !isFocused){
-    sel.innerHTML = '<option value="__all__">전체 프로바이더</option>' + list.map(s=>\`<option value="\${s.provider}">\${s.provider} (\${s.totalRequests})</option>\`).join('');
-    sel.dataset.sig = nextSig;
-  } else if(sel.dataset.sig === nextSig && !isFocused){
-    for(const s of list){
-      const opt = Array.from(sel.options).find(o=>o.value===s.provider);
-      if(opt) opt.textContent = s.provider + ' (' + s.totalRequests + ')';
-    }
-  }
-  sel.value = list.some(s=>s.provider===cur) ? cur : '__all__';
   if(wrap) wrap.setAttribute('aria-busy','false');
   if(meta) meta.textContent = list.length ? \`\${list.length} providers\` : '';
   if(!list.length){ wrap.innerHTML = '<div class="empty"><strong>아직 수집된 프로바이더가 없습니다.</strong><br/>위 예시처럼 <span class="mono">/pass/&lt;host&gt;/&lt;path&gt;</span> 로 요청을 보내면 여기에 카드가 생깁니다.</div>'; return; }
@@ -554,16 +453,10 @@ function renderModelRankings(rankings){
   }).join('');
 }
 
-function filteredRecent(){
-  const q = (document.getElementById('recentSearch')?.value || '').trim().toLowerCase();
-  if(!q) return recentRows;
-  return recentRows.filter(r=> (r.provider+' '+r.path+' '+(r.model||'')).toLowerCase().includes(q));
-}
-
 function renderRecent(){
   const tb = document.getElementById('recentBody');
   const meta = document.getElementById('recentMeta');
-  const list = filteredRecent();
+  const list = recentRows;
   if(meta) meta.textContent = list.length ? \`\\u00b7 \${list.length} rows\` : '';
   if(!list.length){
     const emptyMsg = recentRows.length ? '검색 결과가 없습니다 — 다른 키워드로 시도해 보세요.' : '아직 요청이 없습니다 — 위 curl 예시로 첫 요청을 보내보세요.';
@@ -588,37 +481,20 @@ function renderRecent(){
   }).join('');
 }
 
-function showAlert(msg){
-  const slot = document.getElementById('alertSlot');
-  if(!slot) return;
-  slot.style.display = 'block';
-  slot.innerHTML = \`<div class="alert" role="alert"><span><strong>불러오기 실패</strong> — \${msg} · 잠시 후 다시 시도합니다.</span><span class="alertActions"><button class="btn btn-ghost" type="button" data-role="alertRetry" aria-label="다시 시도">다시 시도</button></span></div>\`;
-  const retry = slot.querySelector('[data-role="alertRetry"]');
-  if(retry) retry.addEventListener('click', ()=> load({manual:true}));
-}
-function clearAlert(){
-  const slot = document.getElementById('alertSlot');
-  if(slot){ slot.style.display='none'; slot.innerHTML=''; }
-}
-
 let isLoading = false;
-async function load(opts){
-  const manual = !!(opts && opts.manual);
+async function load(){
   if(isLoading) return;
   isLoading = true;
   const btn = document.getElementById('refreshBtn');
   const ws = document.getElementById('windowSel');
-  const ps = document.getElementById('providerSel');
   if(btn){ btn.setAttribute('aria-busy','true'); btn.disabled=true; }
   if(ws) ws.disabled = true;
-  if(ps) ps.disabled = true;
   const w = ws ? ws.value : '60';
   try{
     const [statsRes, reqRes] = await Promise.all([
       fetch('/api/stats?window='+w).then(r=>{ if(!r.ok) throw new Error('stats '+r.status); return r.json(); }),
       fetch('/api/requests?limit=100').then(r=>{ if(!r.ok) throw new Error('requests '+r.status); return r.json(); })
     ]);
-    lastStats = statsRes;
     recentRows = reqRes.requests||[];
     document.getElementById('reqCount').textContent = statsRes.total ?? statsRes.summaries?.find(s=>s.provider==='__all__')?.totalRequests ?? 0;
     document.getElementById('chartMeta').textContent = w === 'all' ? '전체 시간' : \`window \${w}m\`;
@@ -627,23 +503,17 @@ async function load(opts){
     renderModelRankings(statsRes.modelRankings||[]);
     ensureCharts(statsRes.series||[], statsRes.summaries||[]);
     renderRecent();
-    clearAlert();
-    announce('대시보드가 갱신되었습니다');
-    if(manual) showToast('새로고침 완료');
   } catch(e){
-    showAlert((e && e.message) ? e.message : '네트워크 오류');
-    announce('불러오기에 실패했습니다');
     const kpis = document.getElementById('kpis');
-    if(kpis && kpis.querySelector('.skeleton')){ kpis.innerHTML = '<div class="alert" role="alert"><span>데이터를 불러오지 못했습니다. 다시 시도하세요.</span><span class="alertActions"><button class="btn btn-ghost" type="button" data-role="kpiRetry">다시 시도</button></span></div>'; const r=kpis.querySelector('[data-role="kpiRetry"]'); if(r) r.addEventListener('click', ()=> load({manual:true})); }
+    if(kpis && kpis.querySelector('.skeleton')){ kpis.innerHTML = '<div class="alert" role="alert"><span>데이터를 불러오지 못했습니다. 다시 시도하세요.</span></div>'; }
   } finally {
     isLoading = false;
     if(btn){ btn.removeAttribute('aria-busy'); btn.disabled=false; }
     if(ws) ws.disabled = false;
-    if(ps) ps.disabled = false;
   }
 }
 
-document.getElementById('refreshBtn').addEventListener('click', ()=> load({manual:true}));
+document.getElementById('refreshBtn').addEventListener('click', ()=> load());
 document.getElementById('windowSel').addEventListener('change', ()=>{
   const ws = document.getElementById('windowSel');
   if(ws){
@@ -651,47 +521,7 @@ document.getElementById('windowSel').addEventListener('change', ()=>{
     u.searchParams.set('window', ws.value);
     history.replaceState(null, '', u.toString());
   }
-  load({manual:true});
-});
-const recentSearchEl = document.getElementById('recentSearch');
-const recentSearchClearEl = document.getElementById('recentSearchClear');
-if(recentSearchEl) recentSearchEl.addEventListener('input', ()=> renderRecent());
-if(recentSearchClearEl) recentSearchClearEl.addEventListener('click', ()=>{
-  if(!recentSearchEl) return;
-  recentSearchEl.value='';
-  recentSearchEl.focus();
-  renderRecent();
-});
-document.getElementById('copyBtn').addEventListener('click', async ()=>{
-  const pre = document.getElementById('exampleCode');
-  const btn = document.getElementById('copyBtn');
-  const label = document.getElementById('copyBtnText');
-  await navigator.clipboard.writeText(pre.textContent);
-  if(btn) btn.dataset.copied='true';
-  if(label) label.textContent='복사됨';
-  if(btn) btn.setAttribute('aria-label','복사됨');
-  announce('예시가 클립보드에 복사되었습니다');
-  showToast('복사됨');
-  clearTimeout(copyTimer);
-  copyTimer = setTimeout(()=>{
-    if(btn) btn.dataset.copied='false';
-    if(label) label.textContent='복사';
-    if(btn) btn.setAttribute('aria-label','예시 복사');
-  }, 1400);
-});
-document.addEventListener('keydown', (e)=>{
-  if((e.metaKey || e.ctrlKey) && e.key.toLowerCase()==='k'){
-    const inp = document.getElementById('recentSearch');
-    if(inp){ e.preventDefault(); inp.focus(); inp.select(); }
-  }
-  if(e.key==='Escape'){
-    const inp = document.getElementById('recentSearch');
-    if(inp && document.activeElement===inp && inp.value){
-      inp.value='';
-      renderRecent();
-      announce('검색어가 지워졌습니다');
-    }
-  }
+  load();
 });
 // Read ?window= from URL on load
 (function(){

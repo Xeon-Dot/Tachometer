@@ -13,64 +13,76 @@ export function extractProvider(pathname: string): {
   return { host, rest };
 }
 
-function parseTokensFromJson(obj: unknown): {
+function pickNum(o: Record<string, unknown>, keys: string[]): number | null {
+  let v: number | null = null;
+  for (const k of keys) if (typeof o[k] === "number") v = o[k] as number;
+  return v;
+}
+
+const IN_KEYS = [
+  "prompt_tokens",
+  "input_tokens",
+  "promptTokenCount",
+  "inputTokens",
+];
+const OUT_KEYS = [
+  "completion_tokens",
+  "output_tokens",
+  "candidatesTokenCount",
+  "outputTokens",
+  "completionTokens",
+];
+const TOTAL_KEYS = ["total_tokens", "totalTokenCount", "totalTokens"];
+const CACHED_KEYS = [
+  "cached_tokens",
+  "cachedTokens",
+  "cache_read_input_tokens",
+  "cached_content_token_count",
+];
+
+function parseTokensFromJson(obj: any): {
   inputTokens: number | null;
   outputTokens: number | null;
   cachedTokens: number | null;
   totalTokens: number | null;
   model: string | null;
 } {
-  if (!obj || typeof obj !== "object")
-    return {
-      inputTokens: null,
-      outputTokens: null,
-      cachedTokens: null,
-      totalTokens: null,
-      model: null,
-    };
+  const none = {
+    inputTokens: null,
+    outputTokens: null,
+    cachedTokens: null,
+    totalTokens: null,
+    model: null,
+  };
+  if (!obj || typeof obj !== "object") return { ...none };
+  const usages = [
+    obj.usage,
+    obj.usageMetadata,
+    obj.usage_metadata,
+    obj.message?.usage,
+    obj.delta?.usage,
+    obj.response?.usage,
+    obj,
+  ].filter((u) => u && typeof u === "object") as Record<string, unknown>[];
   let inputTokens: number | null = null;
   let outputTokens: number | null = null;
   let cachedTokens: number | null = null;
   let totalTokens: number | null = null;
-  let model: string | null = obj.model ?? obj.model_name ?? null;
-
-  const u = obj.usage ?? obj.usageMetadata ?? obj.usage_metadata ?? null;
-  if (u) {
-    if (typeof u.prompt_tokens === "number") inputTokens = u.prompt_tokens;
-    if (typeof u.input_tokens === "number") inputTokens = u.input_tokens;
-    if (typeof u.promptTokenCount === "number")
-      inputTokens = u.promptTokenCount;
-    if (typeof u.inputTokens === "number") inputTokens = u.inputTokens;
-
-    if (typeof u.completion_tokens === "number")
-      outputTokens = u.completion_tokens;
-    if (typeof u.output_tokens === "number") outputTokens = u.output_tokens;
-    if (typeof u.candidatesTokenCount === "number")
-      outputTokens = u.candidatesTokenCount;
-    if (typeof u.outputTokens === "number") outputTokens = u.outputTokens;
-    if (typeof u.completionTokens === "number")
-      outputTokens = u.completionTokens;
-
-    if (typeof u.total_tokens === "number") totalTokens = u.total_tokens;
-    if (typeof u.totalTokenCount === "number") totalTokens = u.totalTokenCount;
-    if (typeof u.totalTokens === "number") totalTokens = u.totalTokens;
-
-    if (typeof u.cached_tokens === "number") cachedTokens = u.cached_tokens;
-    if (typeof u.cachedTokens === "number") cachedTokens = u.cachedTokens;
-    if (
-      u.prompt_tokens_details &&
-      typeof u.prompt_tokens_details.cached_tokens === "number"
-    )
-      cachedTokens = u.prompt_tokens_details.cached_tokens;
-    if (typeof u.cache_read_input_tokens === "number")
-      cachedTokens = u.cache_read_input_tokens;
-    if (typeof u.cached_content_token_count === "number")
-      cachedTokens = u.cached_content_token_count;
+  for (const u of usages) {
+    inputTokens = pickNum(u, IN_KEYS) ?? inputTokens;
+    outputTokens = pickNum(u, OUT_KEYS) ?? outputTokens;
+    totalTokens = pickNum(u, TOTAL_KEYS) ?? totalTokens;
+    cachedTokens =
+      pickNum(u, CACHED_KEYS) ??
+      (u.prompt_tokens_details && typeof u.prompt_tokens_details === "object"
+        ? pickNum(u.prompt_tokens_details as Record<string, unknown>, [
+            "cached_tokens",
+          ])
+        : null) ??
+      cachedTokens;
   }
-  if (obj.prompt_tokens && inputTokens === null)
-    inputTokens = obj.prompt_tokens;
-  if (obj.completion_tokens && outputTokens === null)
-    outputTokens = obj.completion_tokens;
+  const model: string | null =
+    obj.model ?? obj.model_name ?? obj.message?.model ?? null;
   if (inputTokens !== null && outputTokens !== null && totalTokens === null)
     totalTokens = inputTokens + outputTokens;
   return { inputTokens, outputTokens, cachedTokens, totalTokens, model };
@@ -100,26 +112,12 @@ function extractFromSseBuffer(buffer: string) {
     if (!jsonStr || jsonStr === "[DONE]") continue;
     const obj = tryParseJson(jsonStr);
     if (!obj) continue;
-    const candidates = [
-      parseTokensFromJson(obj.message ?? obj.delta ?? obj.response ?? obj),
-      parseTokensFromJson(obj),
-    ];
-    for (const p of candidates) {
-      if (!p) continue;
-      if (p.inputTokens !== null) inputTokens = p.inputTokens;
-      if (p.outputTokens !== null) outputTokens = p.outputTokens;
-      if (p.cachedTokens !== null) cachedTokens = p.cachedTokens;
-      if (p.totalTokens !== null) totalTokens = p.totalTokens;
-      if (p.model) model = p.model;
-    }
-    if (obj.type === "message_start" && obj.message?.usage) {
-      const pu = parseTokensFromJson({ usage: obj.message.usage });
-      if (pu.inputTokens !== null) inputTokens = pu.inputTokens;
-    }
-    if (obj.type === "message_delta" && obj.usage) {
-      const pu = parseTokensFromJson({ usage: obj.usage });
-      if (pu.outputTokens !== null) outputTokens = pu.outputTokens;
-    }
+    const p = parseTokensFromJson(obj);
+    if (p.inputTokens !== null) inputTokens = p.inputTokens;
+    if (p.outputTokens !== null) outputTokens = p.outputTokens;
+    if (p.cachedTokens !== null) cachedTokens = p.cachedTokens;
+    if (p.totalTokens !== null) totalTokens = p.totalTokens;
+    if (p.model) model = p.model;
   }
   return { inputTokens, outputTokens, cachedTokens, totalTokens, model };
 }
@@ -162,23 +160,13 @@ export async function handleProxy(request: Request): Promise<Response> {
     if (buf.byteLength > 0) body = buf;
   }
   const requestBytes = body?.byteLength ?? 0;
-
-  let upstream: Response;
-  try {
-    upstream = await fetch(targetUrl, {
-      method: request.method,
-      headers: forwardHeaders,
-      body: body as unknown,
-      redirect: "manual",
-    } as unknown);
-  } catch (e: unknown) {
-    const latencyMs = Math.round(performance.now() - start);
-    await insertMetric({
+  const log = (extra: Record<string, unknown>) =>
+    insertMetric({
       provider: host,
       path: rest,
       method: request.method,
-      status: 502,
-      latencyMs,
+      status: 0,
+      latencyMs: Math.round(performance.now() - start),
       ttftMs: null,
       isStreaming: false,
       inputTokens: null,
@@ -189,13 +177,25 @@ export async function handleProxy(request: Request): Promise<Response> {
       responseBytes: null,
       timestamp: new Date(),
       model: null,
-      error: String(e?.message ?? e),
-    });
+      error: null,
+      ...extra,
+    } as never);
+
+  let upstream: Response;
+  try {
+    upstream = await fetch(targetUrl, {
+      method: request.method,
+      headers: forwardHeaders,
+      body: body as unknown,
+      redirect: "manual",
+    } as unknown);
+  } catch (e: unknown) {
+    await log({ status: 502, error: String((e as Error)?.message ?? e) });
     return new Response(
       JSON.stringify({
         error: "Upstream fetch failed",
         target: targetUrl,
-        details: String(e?.message ?? e),
+        details: String((e as Error)?.message ?? e),
       }),
       {
         status: 502,
@@ -216,42 +216,15 @@ export async function handleProxy(request: Request): Promise<Response> {
   respHeaders.set("access-control-expose-headers", "*");
 
   if (!upstream.body) {
-    const latencyMs = Math.round(performance.now() - start);
-    let inputTokens: number | null = null,
-      outputTokens: number | null = null,
-      cachedTokens: number | null = null,
-      totalTokens: number | null = null,
-      model: string | null = null;
     const ct = upstream.headers.get("content-type") || "";
     if (ct.includes("application/json")) {
       try {
         const text = await upstream.text();
-        const json = tryParseJson(text);
-        if (json) {
-          const p = parseTokensFromJson(json);
-          inputTokens = p.inputTokens;
-          outputTokens = p.outputTokens;
-          cachedTokens = p.cachedTokens;
-          totalTokens = p.totalTokens;
-          model = p.model;
-        }
-        const metricsLatency = Math.round(performance.now() - start);
-        await insertMetric({
-          provider: host,
-          path: rest,
-          method: request.method,
+        const p = parseTokensFromJson(tryParseJson(text));
+        await log({
           status: upstream.status,
-          latencyMs: metricsLatency,
-          ttftMs: null,
-          isStreaming: false,
-          inputTokens,
-          outputTokens,
-          cachedTokens,
-          totalTokens,
-          requestBytes,
+          ...p,
           responseBytes: text.length,
-          timestamp: new Date(),
-          model,
           error: upstream.ok ? null : `upstream ${upstream.status}`,
         });
         return new Response(text, {
@@ -260,22 +233,9 @@ export async function handleProxy(request: Request): Promise<Response> {
         });
       } catch {}
     }
-    await insertMetric({
-      provider: host,
-      path: rest,
-      method: request.method,
+    await log({
       status: upstream.status,
-      latencyMs,
-      ttftMs: null,
-      isStreaming: false,
-      inputTokens,
-      outputTokens,
-      cachedTokens,
-      totalTokens,
-      requestBytes,
       responseBytes: 0,
-      timestamp: new Date(),
-      model,
       error: upstream.ok ? null : `upstream ${upstream.status}`,
     });
     return new Response(upstream.body, {
@@ -322,49 +282,18 @@ export async function handleProxy(request: Request): Promise<Response> {
         controller.error(e);
       } finally {
         controller.close();
-        const latencyMs = Math.round(performance.now() - start);
-        let inputTokens: number | null = null,
-          outputTokens: number | null = null,
-          cachedTokens: number | null = null,
-          totalTokens: number | null = null,
-          model: string | null = null;
-
-        if (isStreaming || sseBuffer) {
-          const parsed = extractFromSseBuffer(sseBuffer);
-          inputTokens = parsed.inputTokens;
-          outputTokens = parsed.outputTokens;
-          cachedTokens = parsed.cachedTokens;
-          totalTokens = parsed.totalTokens;
-          model = parsed.model;
-        }
-        if (isJsonBuffered && rawBuffer) {
-          const json = tryParseJson(rawBuffer);
-          if (json) {
-            const p = parseTokensFromJson(json);
-            if (p.inputTokens !== null) inputTokens = p.inputTokens;
-            if (p.outputTokens !== null) outputTokens = p.outputTokens;
-            if (p.cachedTokens !== null) cachedTokens = p.cachedTokens;
-            if (p.totalTokens !== null) totalTokens = p.totalTokens;
-            if (p.model) model = p.model;
-          }
-        }
-        const isStreamFlag = isStreaming || sseBuffer.includes("data:");
-        await insertMetric({
-          provider: host,
-          path: rest,
-          method: request.method,
+        const buf = sseBuffer || (isJsonBuffered ? rawBuffer : "");
+        const p = buf
+          ? isJsonBuffered && !sseBuffer
+            ? parseTokensFromJson(tryParseJson(buf))
+            : extractFromSseBuffer(buf)
+          : null;
+        await log({
           status: upstream.status,
-          latencyMs,
           ttftMs,
-          isStreaming: isStreamFlag,
-          inputTokens,
-          outputTokens,
-          cachedTokens,
-          totalTokens,
-          requestBytes,
+          isStreaming: isStreaming || sseBuffer.includes("data:"),
+          ...(p ?? {}),
           responseBytes,
-          timestamp: new Date(),
-          model,
           error: upstream.ok ? null : `upstream ${upstream.status}`,
         });
       }
