@@ -164,7 +164,6 @@ tbody tr:focus-within td{background:var(--table-row-hover)}
 .alert strong{font-weight:600}
 .alertActions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .alert .btn{height:32px;padding:0 12px;font-size:12px;border-radius:6px}
-@media(prefers-reduced-motion:reduce){
 @media(max-width:1024px){
   .wrap{max-width:100%}
   .grid2{grid-template-columns:1fr;gap:14px}
@@ -410,6 +409,8 @@ function renderKpis(summary){
 
 function renderProviders(summaries){
   const wrap = document.getElementById('providers');
+  const meta = document.getElementById('providerMeta');
+  const list = (summaries||[]).filter(s=>s.provider!=='__all__');
   if(wrap) wrap.setAttribute('aria-busy','false');
   if(meta) meta.textContent = list.length ? \`\${list.length} providers\` : '';
   if(!list.length){ wrap.innerHTML = '<div class="empty"><strong>아직 수집된 프로바이더가 없습니다.</strong><br/>위 예시처럼 <span class="mono">/pass/&lt;host&gt;/&lt;path&gt;</span> 로 요청을 보내면 여기에 카드가 생깁니다.</div>'; return; }
