@@ -16,12 +16,12 @@ Env (Bun loads `.env`): `PORT` (3000), `MONGO_URL` or `MONGODB_URI`, `DB_NAME` (
 
 ## Layout
 
-| File | Role |
-|---|---|
-| `src/index.ts` | Elysia app. Register new routes **before** `app.all("/*")`. |
-| `src/proxy.ts` | HTTPS passthrough + token/TTFT scrape |
-| `src/metrics.ts` | In-process aggregations |
-| `src/db.ts` | Mongo collection `requests`; memory fallback |
+| File               | Role                                                                                           |
+| ------------------ | ---------------------------------------------------------------------------------------------- |
+| `src/index.ts`     | Elysia app. Register new routes **before** `app.all("/*")`.                                    |
+| `src/proxy.ts`     | HTTPS passthrough + token/TTFT scrape                                                          |
+| `src/metrics.ts`   | In-process aggregations                                                                        |
+| `src/db.ts`        | Mongo collection `requests`; memory fallback                                                   |
 | `src/dashboard.ts` | Entire UI as one HTML/CSS/JS template string (Chart.js CDN). Do not split into a frontend app. |
 
 `.commandcode/` is design notes, not runtime.
@@ -37,8 +37,6 @@ Env (Bun loads `.env`): `PORT` (3000), `MONGO_URL` or `MONGODB_URI`, `DB_NAME` (
 
 - `GET /` dashboard
 - `GET /health` always 200; `db` is `"mongodb"` \| `"memory"` (compose/Dockerfile healthcheck uses this)
-- `GET /healthz` db ping
-- `GET /readyz` **503 in memory mode**
 - `GET /api/stats?window=60` window max 1440 min; `window=all` = 전체 시간 (데이터 전체 집계, 응답의 `windowMinutes`는 실제 데이터 스팬 분, `allTime: true`); includes synthetic provider `__all__`; `modelRankings` sorted by total tokens
 - `GET /api/requests?limit=100` limit max 500
 
@@ -51,4 +49,4 @@ Env (Bun loads `.env`): `PORT` (3000), `MONGO_URL` or `MONGODB_URI`, `DB_NAME` (
 - Dashboard copy is Korean (`lang="ko"`).
 - Keep model rankings ordered by total tokens (input+output), not request count or latency.
 - Runtime is Bun. Deps are `elysia` + `mongodb` only.
-- Favicon load in `src/index.ts` uses `new URL(...).pathname` with `Bun.file`. On Windows that path is often wrong — if touching it, pass the `URL` to `Bun.file` directly.
+- Favicon load in `src/index.ts` passes the `URL` to `Bun.file` directly.

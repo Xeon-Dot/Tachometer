@@ -75,9 +75,8 @@ body{font-family:'JetBrains Mono',ui-monospace,monospace;background:var(--bg);co
 a{color:var(--foreground);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--border-strong);text-decoration-thickness:1px}
 a:hover{text-decoration-color:var(--foreground)}
 a:focus-visible{outline:2px solid var(--ring);outline-offset:2px;border-radius:2px}
-.topbar{position:sticky;top:0;z-index:20;background:rgba(250,250,250,.96);backdrop-filter:saturate(1.2) blur(8px);border-bottom:1px solid var(--border);min-height:56px;padding:max(10px,env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) 10px max(24px, env(safe-area-inset-left));display:flex;align-items:center;justify-content:space-between;gap:16px;transition:transform .25s ease}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(250,250,250,.96);backdrop-filter:saturate(1.2) blur(8px);border-bottom:1px solid var(--border);min-height:56px;padding:max(10px,env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) 10px max(24px, env(safe-area-inset-left));display:flex;align-items:center;justify-content:space-between;gap:16px}
 html.dark .topbar{background:rgba(0,0,0,.96)}
-@media(max-width:768px){.topbar--hidden{transform:translateY(-100%)}}
 .brand{display:flex;align-items:center;gap:12px;min-width:0;flex:1 1 auto}
 .logo{width:32px;height:32px;border-radius:6px;background:var(--primary);color:var(--primary-fg);display:grid;place-items:center;font-size:13px;font-weight:700;letter-spacing:-.04em;flex-shrink:0}
 .brand h1{font-size:15px;font-weight:700;letter-spacing:-.03em;line-height:1}
@@ -191,26 +190,9 @@ tbody tr:focus-within td{background:var(--table-row-hover)}
 
 @media(max-width:1024px){
   .wrap{max-width:100%}
-  .grid2{gap:14px}
-}
-@media(max-width:960px){
+  .grid2{grid-template-columns:1fr;gap:14px}
   .kpis{grid-template-columns:repeat(2,1fr)}
-  .grid2{grid-template-columns:1fr}
   .chartBox{min-height:220px}
-}
-@media(max-width:768px){
-  .tableWrap table th:first-child,
-  .tableWrap table td:first-child{
-    position:sticky;
-    inset-inline-start:0;
-    z-index:2;
-    border-inline-end:1px solid var(--border);
-    box-shadow:var(--shadow-sticky);
-  }
-  .tableWrap table th:first-child{background:var(--table-th-bg)}
-  .tableWrap table td:first-child{background:var(--card)}
-  .tableWrap table tbody tr:hover td:first-child{background:var(--table-row-hover)}
-  .recentHead{gap:10px}
 }
 @media(max-width:640px){
   .topbar{padding:12px max(16px, env(safe-area-inset-right)) 12px max(16px, env(safe-area-inset-left));gap:12px;align-items:stretch;flex-direction:column}
@@ -227,61 +209,23 @@ tbody tr:focus-within td{background:var(--table-row-hover)}
   .copyBtn{height:36px;min-width:44px}
   .card{padding:16px}
   .chartBox{min-height:200px}
-  .kpis{gap:12px}
+  .kpis{grid-template-columns:1fr;gap:12px}
   .section-head{margin:20px 0 10px}
   .recentHead{padding:12px 14px;align-items:stretch}
   .recentHead > div:last-child{width:100%}
-}
-@media(max-width:520px){
-  .kpis{grid-template-columns:1fr;gap:12px}
-  .card h3{flex-wrap:wrap}
-}
-@media(max-width:480px){
   .providers{grid-template-columns:1fr}
   .metrics{grid-template-columns:repeat(2,1fr)}
-}
-@media(max-width:375px){
-  .wrap{padding:14px max(14px, env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left))}
-  .kpi{padding:14px}
-  .card{padding:14px}
-  .recentHead{padding:12px}
-  .metrics{gap:8px}
-}
-@media(max-width:360px){
-  .brand h1{font-size:14px}
-  .brand p{font-size:11px}
-  .metrics{grid-template-columns:1fr}
-  .chartBox{min-height:180px}
-}
-@media(max-width:320px){
-  .topbar{gap:10px;padding:10px max(12px, env(safe-area-inset-right)) 10px max(12px, env(safe-area-inset-left))}
-  .wrap{padding:12px max(12px, env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left))}
-  .badge{font-size:11px;padding:0 8px;height:32px}
-  .kpi strong{font-size:20px}
-  .providers{gap:10px}
-}
-@media(min-width:1280px){
-  .wrap{max-width:1280px}
-}
-@media(min-width:1536px){
-  .wrap{max-width:1440px}
-}
-@media(min-width:1920px){
-  .wrap{max-width:1440px}
-}
-@media(pointer:coarse){
-  .select,.btn{height:44px;min-height:44px}
-  .searchWrap input{height:44px;min-height:44px}
-  .copyBtn{height:36px;min-height:36px;padding:0 12px}
-  .tableWrap{scroll-snap-type:inline proximity}
-}
-@media(hover:none){
-  .kpi:hover,.prov:hover{border-color:var(--border)}
-}
-@media(prefers-contrast:more){
-  :root{--border:#c9c9cf;--border-strong:#a1a1aa}
-  html.dark{--border:#52525b;--border-strong:#71717a}
-  .card,.kpi,.prov,.tableWrap{border-width:1.5px}
+  .tableWrap table th:first-child,
+  .tableWrap table td:first-child{
+    position:sticky;
+    inset-inline-start:0;
+    z-index:2;
+    border-inline-end:1px solid var(--border);
+    box-shadow:var(--shadow-sticky);
+  }
+  .tableWrap table th:first-child{background:var(--table-th-bg)}
+  .tableWrap table td:first-child{background:var(--card)}
+  .recentHead{gap:10px}
 }
 </style>
 </head>
@@ -405,8 +349,6 @@ curl https://tacho.xeon.kr/pass/api.some.provider/api/v1/chat/completions ...</p
     <a href="/api/requests">/api/requests</a>
     <span>·</span>
     <a href="/health">/health</a>
-    <a href="/healthz">/healthz</a>
-    <a href="/readyz">/readyz</a>
   </div>
 </main>
 <div class="toastHost" aria-live="polite" aria-atomic="true"><div id="toast" class="toast" role="status" data-show="false"></div></div>
@@ -618,10 +560,10 @@ function filteredRecent(){
   return recentRows.filter(r=> (r.provider+' '+r.path+' '+(r.model||'')).toLowerCase().includes(q));
 }
 
-function renderRecent(rows){
+function renderRecent(){
   const tb = document.getElementById('recentBody');
   const meta = document.getElementById('recentMeta');
-  const list = rows ?? filteredRecent();
+  const list = filteredRecent();
   if(meta) meta.textContent = list.length ? \`\\u00b7 \${list.length} rows\` : '';
   if(!list.length){
     const emptyMsg = recentRows.length ? '검색 결과가 없습니다 — 다른 키워드로 시도해 보세요.' : '아직 요청이 없습니다 — 위 curl 예시로 첫 요청을 보내보세요.';
@@ -684,7 +626,7 @@ async function load(opts){
     renderProviders(statsRes.summaries||[]);
     renderModelRankings(statsRes.modelRankings||[]);
     ensureCharts(statsRes.series||[], statsRes.summaries||[]);
-    renderRecent(filteredRecent());
+    renderRecent();
     clearAlert();
     announce('대시보드가 갱신되었습니다');
     if(manual) showToast('새로고침 완료');
@@ -713,35 +655,29 @@ document.getElementById('windowSel').addEventListener('change', ()=>{
 });
 const recentSearchEl = document.getElementById('recentSearch');
 const recentSearchClearEl = document.getElementById('recentSearchClear');
-if(recentSearchEl) recentSearchEl.addEventListener('input', ()=> renderRecent(filteredRecent()));
+if(recentSearchEl) recentSearchEl.addEventListener('input', ()=> renderRecent());
 if(recentSearchClearEl) recentSearchClearEl.addEventListener('click', ()=>{
   if(!recentSearchEl) return;
   recentSearchEl.value='';
   recentSearchEl.focus();
-  renderRecent(filteredRecent());
+  renderRecent();
 });
 document.getElementById('copyBtn').addEventListener('click', async ()=>{
   const pre = document.getElementById('exampleCode');
   const btn = document.getElementById('copyBtn');
   const label = document.getElementById('copyBtnText');
-  try{
-    await navigator.clipboard.writeText(pre.textContent);
-    if(btn) btn.dataset.copied='true';
-    if(label) label.textContent='복사됨';
-    if(btn) btn.setAttribute('aria-label','복사됨');
-    announce('예시가 클립보드에 복사되었습니다');
-    showToast('복사됨');
-    clearTimeout(copyTimer);
-    copyTimer = setTimeout(()=>{
-      if(btn) btn.dataset.copied='false';
-      if(label) label.textContent='복사';
-      if(btn) btn.setAttribute('aria-label','예시 복사');
-    }, 1400);
-  } catch{
-    const r = document.createRange(); r.selectNodeContents(pre); const s=window.getSelection(); s.removeAllRanges(); s.addRange(r);
-    showToast('선택됨 — 복사하세요');
-    announce('예시가 선택되었습니다');
-  }
+  await navigator.clipboard.writeText(pre.textContent);
+  if(btn) btn.dataset.copied='true';
+  if(label) label.textContent='복사됨';
+  if(btn) btn.setAttribute('aria-label','복사됨');
+  announce('예시가 클립보드에 복사되었습니다');
+  showToast('복사됨');
+  clearTimeout(copyTimer);
+  copyTimer = setTimeout(()=>{
+    if(btn) btn.dataset.copied='false';
+    if(label) label.textContent='복사';
+    if(btn) btn.setAttribute('aria-label','예시 복사');
+  }, 1400);
 });
 document.addEventListener('keydown', (e)=>{
   if((e.metaKey || e.ctrlKey) && e.key.toLowerCase()==='k'){
@@ -752,22 +688,11 @@ document.addEventListener('keydown', (e)=>{
     const inp = document.getElementById('recentSearch');
     if(inp && document.activeElement===inp && inp.value){
       inp.value='';
-      renderRecent(filteredRecent());
+      renderRecent();
       announce('검색어가 지워졌습니다');
     }
   }
 });
-const exampleCodeEl = document.getElementById('exampleCode');
-if(exampleCodeEl){
-  exampleCodeEl.addEventListener('keydown', async (e)=>{
-    if((e.metaKey || e.ctrlKey) && e.key.toLowerCase()==='c' && window.getSelection().isCollapsed){
-      e.preventDefault();
-      const btn = document.getElementById('copyBtn');
-      if(btn) btn.click();
-    }
-  });
-}
-
 // Read ?window= from URL on load
 (function(){
   const u = new URL(location.href);
@@ -792,22 +717,6 @@ function startPolling(){
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', startPolling);
 else startPolling();
-
-// ponytail: hide topbar on scroll-down, show on scroll-up (mobile only)
-(function(){
-  const topbar = document.querySelector('.topbar');
-  if(!topbar || matchMedia('(min-width:769px)').matches || reducedMotion) return;
-  let lastY = 0, ticking = false;
-  addEventListener('scroll', ()=>{
-    if(ticking) return; ticking = true;
-    requestAnimationFrame(()=>{
-      const y = scrollY;
-      if(y > 56 && y - lastY > 4) topbar.classList.add('topbar--hidden');
-      else if(y < lastY - 4 || y <= 0) topbar.classList.remove('topbar--hidden');
-      lastY = y; ticking = false;
-    });
-  }, {passive:true});
-})();
 </script>
 </body>
-</html>`
+</html>`;

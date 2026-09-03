@@ -9,10 +9,10 @@
     "build": "bun build src/index.ts --outdir dist --target bun"
   },
   "dependencies": {
-    "elysia": "^1.2.25",
-    "mongodb": "^6.12.0"
+    "elysia": "^1.4.30",
+    "mongodb": "^6.21.0"
   },
   "devDependencies": {
-    "bun-types": "^1.2.8"
+    "bun-types": "^1.4.0"
   }
 }
