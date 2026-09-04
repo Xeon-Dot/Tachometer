@@ -7,6 +7,7 @@ export function extractProvider(pathname: string): {
   const trimmed = pathname.replace(/^\/+/, "");
   if (!trimmed) return { host: null, rest: "/" };
   const idx = trimmed.indexOf("/");
+  // Handle paths that start with "/"
   const host = idx === -1 ? trimmed : trimmed.slice(0, idx);
   const rest = idx === -1 ? "/" : "/" + trimmed.slice(idx + 1);
   if (!host.includes(".")) return { host: null, rest: pathname };
@@ -82,7 +83,11 @@ function parseTokensFromJson(obj: any): {
       cachedTokens;
   }
   const model: string | null =
-    obj.model ?? obj.model_name ?? obj.message?.model ?? null;
+    obj.model ??
+    obj.model_name ??
+    obj.message?.model ??
+    obj.response?.model ??
+    null;
   if (inputTokens !== null && outputTokens !== null && totalTokens === null)
     totalTokens = inputTokens + outputTokens;
   return { inputTokens, outputTokens, cachedTokens, totalTokens, model };
