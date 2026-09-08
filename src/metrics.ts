@@ -127,7 +127,7 @@ export type ModelRanking = {
 export function computeModelRankings(items: RequestMetric[]): ModelRanking[] {
   const groups = new Map<string, RequestMetric[]>();
   for (const m of items) {
-    const key = m.model || "(unknown)";
+    const key = (m.model || "(unknown)").replace(/[:-]free$/, "") || "(unknown)";
     if (!groups.has(key)) groups.set(key, []);
     groups.get(key)?.push(m);
   }
