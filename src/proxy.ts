@@ -165,8 +165,12 @@ export async function handleProxy(request: Request): Promise<Response> {
     if (buf.byteLength > 0) body = buf;
   }
   const requestBytes = body?.byteLength ?? 0;
+  const skipMetric =
+    request.method === "GET" && /\/models\/?$/.test(rest);
   const log = (extra: Record<string, unknown>) =>
-    insertMetric({
+    skipMetric
+      ? Promise.resolve()
+      : insertMetric({
       provider: host,
       path: rest,
       method: request.method,
