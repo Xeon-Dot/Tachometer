@@ -214,6 +214,10 @@ tbody tr:focus-within td{background:var(--table-row-hover)}
   </div>
   <div class="controls" role="toolbar" aria-label="대시보드 컨트롤">
     <span class="badge" aria-live="polite" aria-atomic="true"><i class="dot" aria-hidden="true"></i> <span id="liveText">LIVE</span> <span style="color:var(--muted-fg-soft)" aria-hidden="true">·</span> <span id="reqCount" class="mono" style="font-weight:600">—</span><span style="color:var(--muted-fg)">req</span></span>
+    <label class="sr-only" for="providerSel">프로바이더</label>
+    <select id="providerSel" class="select" aria-label="프로바이더">
+      <option value="all">전체 프로바이더</option>
+    </select>
     <label class="sr-only" for="windowSel">시간 윈도우</label>
     <select id="windowSel" class="select" aria-label="시간 윈도우">
       <option value="5">최근 5분</option>
@@ -483,22 +487,54 @@ function renderRecent(){
 }
 
 let isLoading = false;
+function escAttr(s){ return String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;'); }
+function syncProviderOptions(providers, current){
+  const ps = document.getElementById('providerSel');
+  if(!ps) return;
+  const list = Array.isArray(providers) ? providers : [];
+  const key = 'all\\0' + list.join('\\0');
+  if(ps.dataset.optsKey === key){
+    if(ps.value !== current && (current === 'all' || list.includes(current))) ps.value = current;
+    return;
+  }
+  ps.dataset.optsKey = key;
+  ps.innerHTML = '<option value="all">전체 프로바이더</option>' + list.map(function(p){ return '<option value="' + escAttr(p) + '">' + escAttr(p) + '</option>'; }).join('');
+  if(current && current !== 'all' && !list.includes(current)){
+    const opt = document.createElement('option');
+    opt.value = current; opt.textContent = current;
+    ps.appendChild(opt);
+  }
+  ps.value = current || 'all';
+}
+function syncUrl(w, p){
+  const u = new URL(location.href);
+  u.searchParams.set('window', w);
+  if(p && p !== 'all') u.searchParams.set('provider', p);
+  else u.searchParams.delete('provider');
+  history.replaceState(null, '', u.toString());
+}
 async function load(){
   if(isLoading) return;
   isLoading = true;
   const btn = document.getElementById('refreshBtn');
   const ws = document.getElementById('windowSel');
+  const ps = document.getElementById('providerSel');
   if(btn){ btn.setAttribute('aria-busy','true'); btn.disabled=true; }
   if(ws) ws.disabled = true;
+  if(ps) ps.disabled = true;
   const w = ws ? ws.value : '60';
+  const p = ps ? ps.value : 'all';
   try{
     const [statsRes, reqRes] = await Promise.all([
-      fetch('/api/stats?window='+w).then(r=>{ if(!r.ok) throw new Error('stats '+r.status); return r.json(); }),
-      fetch('/api/requests?limit=100').then(r=>{ if(!r.ok) throw new Error('requests '+r.status); return r.json(); })
+      fetch('/api/stats?window='+encodeURIComponent(w)+'&provider='+encodeURIComponent(p)).then(r=>{ if(!r.ok) throw new Error('stats '+r.status); return r.json(); }),
+      fetch('/api/requests?limit=100&provider='+encodeURIComponent(p)).then(r=>{ if(!r.ok) throw new Error('requests '+r.status); return r.json(); })
     ]);
+    const providers = statsRes.providers || (statsRes.summaries||[]).filter(s=>s.provider!=='__all__').map(s=>s.provider);
+    syncProviderOptions(providers, statsRes.provider || p);
     recentRows = reqRes.requests||[];
     document.getElementById('reqCount').textContent = statsRes.total ?? statsRes.summaries?.find(s=>s.provider==='__all__')?.totalRequests ?? 0;
-    document.getElementById('chartMeta').textContent = w === 'all' ? '전체 시간' : \`window \${w}m\`;
+    const provLabel = (statsRes.provider && statsRes.provider !== 'all') ? ' \\u00b7 ' + statsRes.provider : '';
+    document.getElementById('chartMeta').textContent = (w === 'all' ? '전체 시간' : 'window ' + w + 'm') + provLabel;
     renderKpis(statsRes.summaries||[]);
     renderProviders(statsRes.summaries||[]);
     renderModelRankings(statsRes.modelRankings||[]);
@@ -511,20 +547,20 @@ async function load(){
     isLoading = false;
     if(btn){ btn.removeAttribute('aria-busy'); btn.disabled=false; }
     if(ws) ws.disabled = false;
+    if(ps) ps.disabled = false;
   }
 }
 
 document.getElementById('refreshBtn').addEventListener('click', ()=> load());
-document.getElementById('windowSel').addEventListener('change', ()=>{
+function onFilterChange(){
   const ws = document.getElementById('windowSel');
-  if(ws){
-    const u = new URL(location.href);
-    u.searchParams.set('window', ws.value);
-    history.replaceState(null, '', u.toString());
-  }
+  const ps = document.getElementById('providerSel');
+  syncUrl(ws ? ws.value : '60', ps ? ps.value : 'all');
   load();
-});
-// Read ?window= from URL on load
+}
+document.getElementById('windowSel').addEventListener('change', onFilterChange);
+document.getElementById('providerSel').addEventListener('change', onFilterChange);
+// Read ?window= and ?provider= from URL on load
 (function(){
   const u = new URL(location.href);
   const w = u.searchParams.get('window');
@@ -532,6 +568,18 @@ document.getElementById('windowSel').addEventListener('change', ()=>{
     const ws = document.getElementById('windowSel');
     if(ws && Array.from(ws.options).some(o=>o.value===w)){
       ws.value = w;
+    }
+  }
+  const pv = u.searchParams.get('provider');
+  if(pv){
+    const ps = document.getElementById('providerSel');
+    if(ps){
+      if(!Array.from(ps.options).some(o=>o.value===pv)){
+        const opt = document.createElement('option');
+        opt.value = pv; opt.textContent = pv;
+        ps.appendChild(opt);
+      }
+      ps.value = pv;
     }
   }
 })();

@@ -23,34 +23,41 @@ app.get("/health", () => ({
 
 app.get("/api/requests", async ({ query }) => {
   const limit = Math.min(Number((query as unknown).limit || 100), 500);
-  const requests = await queryMetrics({ limit });
-  return { requests };
+  const rawProvider = String((query as unknown).provider ?? "all");
+  const provider = rawProvider && rawProvider !== "all" ? rawProvider : undefined;
+  const requests = await queryMetrics({ limit, provider });
+  return { requests, provider: provider ?? "all" };
 });
 
 app.get("/api/stats", async ({ query }) => {
   const raw = (query as unknown).window;
   const allTime = raw === "all";
   const requestedMinutes = allTime ? 0 : Math.min(Number(raw || 60), 1440);
+  const rawProvider = String((query as unknown).provider ?? "all");
+  const provider =
+    rawProvider && rawProvider !== "all" ? rawProvider : undefined;
   const all = await queryMetrics(
     allTime || requestedMinutes >= 1440
       ? {}
       : { since: new Date(Date.now() - requestedMinutes * 60 * 1000) },
   );
+  const providers = [...new Set(all.map((m) => m.provider))].sort();
+  const items = provider ? all.filter((m) => m.provider === provider) : all;
   const windowMinutes = allTime
     ? Math.max(
         1,
-        all.length
+        items.length
           ? Math.floor(
               (Date.now() -
-                Math.min(...all.map((m) => m.timestamp.getTime()))) /
+                Math.min(...items.map((m) => m.timestamp.getTime()))) /
                 60000,
             ) + 1
           : 1,
       )
     : requestedMinutes;
-  const summaries = computeSummaries(all, windowMinutes);
-  const series = computeTimeSeries(all, windowMinutes);
-  const modelRankings = computeModelRankings(all);
+  const summaries = computeSummaries(items, windowMinutes);
+  const series = computeTimeSeries(items, windowMinutes);
+  const modelRankings = computeModelRankings(items);
   const total =
     summaries.find((s) => s.provider === "__all__")?.totalRequests ?? 0;
   return {
@@ -58,6 +65,8 @@ app.get("/api/stats", async ({ query }) => {
     allTime,
     bucketMinutes: 5,
     total,
+    providers,
+    provider: provider ?? "all",
     summaries,
     series,
     modelRankings,

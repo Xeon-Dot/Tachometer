@@ -86,12 +86,14 @@ export async function insertMetric(m: RequestMetric) {
 }
 
 export async function queryMetrics(
-  opts: { since?: Date; limit?: number } = {},
+  opts: { since?: Date; limit?: number; provider?: string } = {},
 ): Promise<RequestMetric[]> {
   const col = getCollection();
   if (col) {
     try {
-      const q = opts.since ? { timestamp: { $gte: opts.since } } : {};
+      const q: Record<string, unknown> = {};
+      if (opts.since) q.timestamp = { $gte: opts.since };
+      if (opts.provider) q.provider = opts.provider;
       let cur = col.find(q as never).sort({ timestamp: -1 });
       if (opts.limit) cur = cur.limit(opts.limit);
       return (await cur.toArray()) as unknown as RequestMetric[];
@@ -99,6 +101,7 @@ export async function queryMetrics(
   }
   let rows = [...memoryStore];
   if (opts.since) rows = rows.filter((m) => m.timestamp >= opts.since!);
+  if (opts.provider) rows = rows.filter((m) => m.provider === opts.provider);
   rows.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
   return opts.limit ? rows.slice(0, opts.limit) : rows;
 }
