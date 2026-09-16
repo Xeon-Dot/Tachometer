@@ -124,15 +124,30 @@ export type ModelRanking = {
   providers: string[];
 };
 
+export function normalizeModelName(raw: string | null | undefined): string {
+  if (!raw) return "(unknown)";
+  let name = raw.trim();
+  if (!name) return "(unknown)";
+  // Gateway/OpenRouter 스타일 "제작사/모델" → "모델" (마지막 "/" 뒤만 사용)
+  // e.g. "meta/muse-spark-1.3-contributor" → "muse-spark-1.3-contributor"
+  const slash = name.lastIndexOf("/");
+  if (slash !== -1) name = name.slice(slash + 1).trim();
+  if (!name) return "(unknown)";
+  name = name.replace(/[:-]free$/i, "");
+  if (!name) return "(unknown)";
+  return name;
+}
+
 export function computeModelRankings(items: RequestMetric[]): ModelRanking[] {
-  const groups = new Map<string, RequestMetric[]>();
+  const groups = new Map<string, { display: string; items: RequestMetric[] }>();
   for (const m of items) {
-    const key = (m.model || "(unknown)").replace(/[:-]free$/, "") || "(unknown)";
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key)?.push(m);
+    const display = normalizeModelName(m.model);
+    const key = display.toLowerCase();
+    if (!groups.has(key)) groups.set(key, { display, items: [] });
+    groups.get(key)?.items.push(m);
   }
   const rankings: ModelRanking[] = [];
-  for (const [model, group] of groups) {
+  for (const { display: model, items: group } of groups.values()) {
     const inputTokens = group.reduce((a, i) => a + (i.inputTokens ?? 0), 0);
     const outputTokens = group.reduce((a, i) => a + (i.outputTokens ?? 0), 0);
     const cachedTokens = group.reduce((a, i) => a + (i.cachedTokens ?? 0), 0);
