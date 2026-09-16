@@ -40,6 +40,21 @@ const CACHED_KEYS = [
   "cache_read_input_tokens",
   "cached_content_token_count",
 ];
+// Chat Completions nests cache reads in prompt_tokens_details,
+// the Responses API nests them in input_tokens_details.
+const CACHE_DETAIL_KEYS = ["prompt_tokens_details", "input_tokens_details"];
+
+function pickCachedFromDetails(u: Record<string, unknown>): number | null {
+  for (const k of CACHE_DETAIL_KEYS) {
+    const details = u[k];
+    if (!details || typeof details !== "object") continue;
+    const cached = pickNum(details as Record<string, unknown>, [
+      "cached_tokens",
+    ]);
+    if (cached !== null) return cached;
+  }
+  return null;
+}
 
 function parseTokensFromJson(obj: any): {
   inputTokens: number | null;
@@ -75,11 +90,7 @@ function parseTokensFromJson(obj: any): {
     totalTokens = pickNum(u, TOTAL_KEYS) ?? totalTokens;
     cachedTokens =
       pickNum(u, CACHED_KEYS) ??
-      (u.prompt_tokens_details && typeof u.prompt_tokens_details === "object"
-        ? pickNum(u.prompt_tokens_details as Record<string, unknown>, [
-            "cached_tokens",
-          ])
-        : null) ??
+      pickCachedFromDetails(u) ??
       cachedTokens;
   }
   const model: string | null =
