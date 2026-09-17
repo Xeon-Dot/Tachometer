@@ -56,7 +56,7 @@ function pickCachedFromDetails(u: Record<string, unknown>): number | null {
   return null;
 }
 
-function parseTokensFromJson(obj: any): {
+function parseTokensFromJson(obj: unknown): {
   inputTokens: number | null;
   outputTokens: number | null;
   cachedTokens: number | null;
