@@ -89,9 +89,7 @@ function parseTokensFromJson(obj: any): {
     outputTokens = pickNum(u, OUT_KEYS) ?? outputTokens;
     totalTokens = pickNum(u, TOTAL_KEYS) ?? totalTokens;
     cachedTokens =
-      pickNum(u, CACHED_KEYS) ??
-      pickCachedFromDetails(u) ??
-      cachedTokens;
+      pickNum(u, CACHED_KEYS) ?? pickCachedFromDetails(u) ?? cachedTokens;
   }
   const model: string | null =
     obj.model ??
@@ -176,30 +174,29 @@ export async function handleProxy(request: Request): Promise<Response> {
     if (buf.byteLength > 0) body = buf;
   }
   const requestBytes = body?.byteLength ?? 0;
-  const skipMetric =
-    request.method === "GET" && /\/models\/?$/.test(rest);
+  const skipMetric = request.method === "GET" && /\/models\/?$/.test(rest);
   const log = (extra: Record<string, unknown>) =>
     skipMetric
       ? Promise.resolve()
       : insertMetric({
-      provider: host,
-      path: rest,
-      method: request.method,
-      status: 0,
-      latencyMs: Math.round(performance.now() - start),
-      ttftMs: null,
-      isStreaming: false,
-      inputTokens: null,
-      outputTokens: null,
-      cachedTokens: null,
-      totalTokens: null,
-      requestBytes,
-      responseBytes: null,
-      timestamp: new Date(),
-      model: null,
-      error: null,
-      ...extra,
-    } as never);
+          provider: host,
+          path: rest,
+          method: request.method,
+          status: 0,
+          latencyMs: Math.round(performance.now() - start),
+          ttftMs: null,
+          isStreaming: false,
+          inputTokens: null,
+          outputTokens: null,
+          cachedTokens: null,
+          totalTokens: null,
+          requestBytes,
+          responseBytes: null,
+          timestamp: new Date(),
+          model: null,
+          error: null,
+          ...extra,
+        } as never);
 
   let upstream: Response;
   try {

@@ -24,7 +24,8 @@ app.get("/health", () => ({
 app.get("/api/requests", async ({ query }) => {
   const limit = Math.min(Number((query as unknown).limit || 100), 500);
   const rawProvider = String((query as unknown).provider ?? "all");
-  const provider = rawProvider && rawProvider !== "all" ? rawProvider : undefined;
+  const provider =
+    rawProvider && rawProvider !== "all" ? rawProvider : undefined;
   const requests = await queryMetrics({ limit, provider });
   return { requests, provider: provider ?? "all" };
 });
