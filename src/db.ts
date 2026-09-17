@@ -53,6 +53,7 @@ export async function initDb() {
       );
       throw new Error(
         `REQUIRE_MONGO is set but mongodb is not reachable at ${MONGO_URL}`,
+        { cause: e },
       );
     }
     console.warn(

@@ -6,13 +6,20 @@
   "scripts": {
     "dev": "bun run --watch src/index.ts",
     "start": "bun run src/index.ts",
-    "build": "bun build src/index.ts --outdir dist --target bun"
+    "build": "bun build src/index.ts --outdir dist --target bun",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "elysia": "^1.4.30",
     "mongodb": "^6.21.0"
   },
   "devDependencies": {
-    "bun-types": "^1.4.2"
+    "@eslint/js": "^10.0.1",
+    "bun-types": "^1.4.2",
+    "eslint": "^10.10.0",
+    "globals": "^17.12.0",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.70.0"
   }
 }
