@@ -13,6 +13,9 @@ export const dashboardHtml = `<!DOCTYPE html>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script>
+(function(){try{var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark')t='system';var d=t==='dark'||(t==='system'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark');}catch(e){}})();
+</script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -67,7 +70,7 @@ html.dark{
   --btn-hover:#3f3f46;--btn-ghost-active:#27272a;
   --shadow-sticky:2px 0 6px rgba(0,0,0,.4);
 }
-html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;scrollbar-gutter:stable;overflow-x:clip;transition:color-scheme .3s}
+html{color-scheme:light;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;scrollbar-gutter:stable;overflow-x:clip;transition:color-scheme .3s}
 html.dark{color-scheme:dark}
 body{font-family:'JetBrains Mono',ui-monospace,monospace;background:var(--bg);color:var(--foreground);min-height:100vh;line-height:1.5;font-size:14px;overflow-x:clip;max-width:100%}
 .mono{font-family:'JetBrains Mono',ui-monospace,monospace}
@@ -99,6 +102,8 @@ html.dark .topbar{background:rgba(0,0,0,.96)}
 .btn-ghost{background:var(--card);color:var(--foreground);border-color:var(--border)}
 .btn-ghost:hover{background:var(--muted);border-color:var(--border-strong)}
 .btn-ghost:active{background:var(--btn-ghost-active)}
+.themeBtn{width:40px;padding:0;font-size:15px;flex-shrink:0}
+.themeIcon{display:block;line-height:1;font-size:15px}
 .select:disabled{opacity:.55;cursor:not-allowed;background-color:var(--muted)}
 .badge{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:500;padding:0 10px;height:32px;border-radius:999px;border:1px solid var(--border);background:var(--card);white-space:nowrap}
 .dot{width:7px;height:7px;border-radius:50%;background:#16a34a;flex-shrink:0;box-shadow:0 0 0 3px rgba(22,163,74,.12)}
@@ -214,6 +219,7 @@ tbody tr:focus-within td{background:var(--table-row-hover)}
   </div>
   <div class="controls" role="toolbar" aria-label="대시보드 컨트롤">
     <span class="badge" aria-live="polite" aria-atomic="true"><i class="dot" aria-hidden="true"></i> <span id="liveText">LIVE</span> <span style="color:var(--muted-fg-soft)" aria-hidden="true">·</span> <span id="reqCount" class="mono" style="font-weight:600">—</span><span style="color:var(--muted-fg)">req</span></span>
+    <button class="btn btn-ghost themeBtn" id="themeBtn" type="button" aria-label="테마 변경" title="테마"><span class="themeIcon" id="themeIcon" aria-hidden="true"></span></button>
     <label class="sr-only" for="providerSel">프로바이더</label>
     <select id="providerSel" class="select" aria-label="프로바이더">
       <option value="all">전체 프로바이더</option>
@@ -329,6 +335,44 @@ const $ = s=>document.querySelector(s);
 let mainChart, tokenChart;
 let recentRows = [];
 const reducedMotion = typeof window.matchMedia==='function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const THEME_KEY='theme';
+const THEME_LABEL={light:'라이트',dark:'다크',system:'시스템'};
+const THEME_ICON={light:'☀',dark:'☾',system:'◐'};
+const themeMedia = typeof window.matchMedia==='function' ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+
+function readTheme(){
+  try{
+    const t=localStorage.getItem(THEME_KEY);
+    if(t==='light'||t==='dark') return t;
+  }catch(e){}
+  return 'system';
+}
+function prefersDark(){ return !!(themeMedia && themeMedia.matches); }
+function applyTheme(){
+  const mode=readTheme();
+  const dark = mode==='dark' || (mode==='system' && prefersDark());
+  document.documentElement.classList.toggle('dark', dark);
+  const icon=document.getElementById('themeIcon');
+  if(icon) icon.textContent=THEME_ICON[mode];
+  const btn=document.getElementById('themeBtn');
+  if(btn){
+    const label=THEME_LABEL[mode];
+    btn.title='테마: '+label;
+    btn.setAttribute('aria-label','테마 변경 — 현재 '+label+', 눌러서 전환');
+  }
+  applyChartTheme();
+}
+function cycleTheme(){
+  const order={light:'dark',dark:'system',system:'light'};
+  const next=order[readTheme()]||'light';
+  try{ localStorage.setItem(THEME_KEY,next); }catch(e){}
+  applyTheme();
+}
+if(themeMedia){
+  const onSchemeChange=function(){ if(readTheme()==='system') applyTheme(); };
+  if(themeMedia.addEventListener) themeMedia.addEventListener('change',onSchemeChange);
+  else if(themeMedia.addListener) themeMedia.addListener(onSchemeChange);
+}
 
 
 function chartDefaults(){
@@ -337,6 +381,40 @@ function chartDefaults(){
     responsive: true,
     maintainAspectRatio: true,
   };
+}
+
+function chartPalette(){
+  const cs=getComputedStyle(document.documentElement);
+  return {
+    grid:cs.getPropertyValue('--chart-grid').trim()||'rgba(228,228,231,1)',
+    tick:cs.getPropertyValue('--chart-tick').trim()||'#52525b',
+    bar:cs.getPropertyValue('--chart-bar').trim()||'#18181b',
+    line:cs.getPropertyValue('--chart-line').trim()||'#71717a',
+    lineBg:cs.getPropertyValue('--chart-line-bg').trim()||'rgba(113,113,122,.08)',
+    doughnut:(cs.getPropertyValue('--chart-doughnut').trim()||'#18181b,#71717a,#e4e4e7').split(',')
+  };
+}
+
+function applyChartTheme(){
+  const p=chartPalette();
+  if(mainChart){
+    const ds=mainChart.data.datasets;
+    ds[0].backgroundColor=p.bar;
+    ds[1].borderColor=p.line;
+    ds[1].backgroundColor=p.lineBg;
+    mainChart.options.plugins.legend.labels.color=p.tick;
+    mainChart.options.scales.x.ticks.color=p.tick;
+    mainChart.options.scales.x.grid.color=p.grid;
+    mainChart.options.scales.y.ticks.color=p.tick;
+    mainChart.options.scales.y.grid.color=p.grid;
+    mainChart.options.scales.y1.ticks.color=p.tick;
+    mainChart.update('none');
+  }
+  if(tokenChart){
+    tokenChart.data.datasets[0].backgroundColor=p.doughnut;
+    tokenChart.options.plugins.legend.labels.color=p.tick;
+    tokenChart.update('none');
+  }
 }
 
 function ensureCharts(series, summary){
@@ -350,12 +428,8 @@ function ensureCharts(series, summary){
   const sum = summary.find(s=>s.provider==='__all__');
   const hint = document.getElementById('tokenHint');
   if(hint) hint.textContent = sum ? \`RPM \${sum.rpm} \\u00b7 TPM in \${fmt(sum.tpm.input)} / out \${fmt(sum.tpm.output)} \\u00b7 tokens/sec \${fmt(sum.tokensPerSec)}\` : '\\u2014';
-  const cs=getComputedStyle(document.documentElement);
-  const grid=cs.getPropertyValue('--chart-grid').trim()||'rgba(228,228,231,1)';
-  const tick=cs.getPropertyValue('--chart-tick').trim()||'#52525b';
-  const barColor=cs.getPropertyValue('--chart-bar').trim()||'#18181b';
-  const lineColor=cs.getPropertyValue('--chart-line').trim()||'#71717a';
-  const lineBg=cs.getPropertyValue('--chart-line-bg').trim()||'rgba(113,113,122,.08)';
+  const pal=chartPalette();
+  const grid=pal.grid, tick=pal.tick, barColor=pal.bar, lineColor=pal.line, lineBg=pal.lineBg;
   const common = chartDefaults();
   const tokenData = [sum?sum.inputTokens.total:0, sum?sum.outputTokens.total:0, sum?sum.cachedTokens.total:0];
   if(mainChart){
@@ -382,7 +456,7 @@ function ensureCharts(series, summary){
       }
     });
   }
-  const doughnutColors=(cs.getPropertyValue('--chart-doughnut').trim()||'#18181b,#71717a,#e4e4e7').split(',');
+  const doughnutColors=pal.doughnut;
   if(tokenChart){
     tokenChart.data.datasets[0].data = tokenData;
     tokenChart.update('none');
@@ -582,6 +656,13 @@ document.getElementById('providerSel').addEventListener('change', onFilterChange
       ps.value = pv;
     }
   }
+})();
+
+// theme toggle wiring
+(function(){
+  const btn=document.getElementById('themeBtn');
+  if(btn) btn.addEventListener('click', cycleTheme);
+  applyTheme();
 })();
 
 function waitForChart(cb){
