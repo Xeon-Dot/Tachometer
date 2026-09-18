@@ -21,6 +21,21 @@ function statsFor(latencies: number[]) {
   };
 }
 
+// Anthropic reports `input_tokens` already excluding cache reads
+// (`cache_read_input_tokens` is separate), so cached tokens must not be
+// subtracted again. Other providers (OpenAI, Gemini, …) count cached tokens
+// inside the prompt/input total.
+export function inputExcludesCached(provider: string): boolean {
+  return /anthropic/i.test(provider);
+}
+
+/** Input tokens with the cached portion removed when the provider includes it. */
+export function netInputTokens(item: RequestMetric): number {
+  const input = item.inputTokens ?? 0;
+  if (inputExcludesCached(item.provider)) return input;
+  return Math.max(0, input - (item.cachedTokens ?? 0));
+}
+
 export type ProviderSummary = {
   provider: string;
   totalRequests: number;
@@ -39,11 +54,16 @@ export type ProviderSummary = {
     p99: number | null;
     avg: number | null;
   };
-  inputTokens: { total: number; avg: number | null };
+  inputTokens: {
+    total: number;
+    avg: number | null;
+    netTotal: number;
+    netAvg: number | null;
+  };
   outputTokens: { total: number; avg: number | null };
   cachedTokens: { total: number };
   rpm: number;
-  tpm: { input: number; output: number; total: number };
+  tpm: { input: number; output: number; total: number; netInput: number };
   tokensPerSec: number | null;
 };
 
@@ -63,6 +83,7 @@ function buildSummary(
   const inputTotal = items.reduce((a, i) => a + (i.inputTokens ?? 0), 0);
   const outputTotal = items.reduce((a, i) => a + (i.outputTokens ?? 0), 0);
   const cachedTotal = items.reduce((a, i) => a + (i.cachedTokens ?? 0), 0);
+  const netInputTotal = items.reduce((a, i) => a + netInputTokens(i), 0);
   const totalTokensForRate = items.reduce(
     (a, i) =>
       a + (i.totalTokens ?? (i.inputTokens ?? 0) + (i.outputTokens ?? 0)),
@@ -95,6 +116,10 @@ function buildSummary(
       avg: countWithInput
         ? Math.round((inputTotal / countWithInput) * 100) / 100
         : null,
+      netTotal: netInputTotal,
+      netAvg: countWithInput
+        ? Math.round((netInputTotal / countWithInput) * 100) / 100
+        : null,
     },
     outputTokens: {
       total: outputTotal,
@@ -108,6 +133,7 @@ function buildSummary(
       input: rate(inputTotal),
       output: rate(outputTotal),
       total: rate(totalTokensForRate),
+      netInput: rate(netInputTotal),
     },
     tokensPerSec: tps,
   };
@@ -117,6 +143,7 @@ export type ModelRanking = {
   model: string;
   totalTokens: number;
   inputTokens: number;
+  netInputTokens: number;
   outputTokens: number;
   cachedTokens: number;
   totalRequests: number;
@@ -149,6 +176,7 @@ export function computeModelRankings(items: RequestMetric[]): ModelRanking[] {
   const rankings: ModelRanking[] = [];
   for (const { display: model, items: group } of groups.values()) {
     const inputTokens = group.reduce((a, i) => a + (i.inputTokens ?? 0), 0);
+    const netInputTokensTotal = group.reduce((a, i) => a + netInputTokens(i), 0);
     const outputTokens = group.reduce((a, i) => a + (i.outputTokens ?? 0), 0);
     const cachedTokens = group.reduce((a, i) => a + (i.cachedTokens ?? 0), 0);
     const totalTokens = group.reduce(
@@ -164,6 +192,7 @@ export function computeModelRankings(items: RequestMetric[]): ModelRanking[] {
       model,
       totalTokens,
       inputTokens,
+      netInputTokens: netInputTokensTotal,
       outputTokens,
       cachedTokens,
       totalRequests: group.length,

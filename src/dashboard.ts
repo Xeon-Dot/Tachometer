@@ -330,6 +330,8 @@ curl https://tacho.xeon.kr/pass/api.some.provider/api/v1/chat/completions ...</p
 const fmt = n=> n==null ? '\\u2014' : (typeof n==='number'? (Number.isInteger(n)? n.toLocaleString() : n.toLocaleString()): n);
 const ms = n=>{ if(n==null) return '\\u2014'; if(Math.abs(n)>=1000) return (n/1000).toFixed(n>=10000?1:2)+' s'; return n+' ms'; };
 const pct = n=> n==null ? '\\u2014' : n+'%';
+const inputExcludesCached = p=> /anthropic/i.test(String(p||''));
+const netIn = (total, cached, provider)=> inputExcludesCached(provider) ? (total||0) : Math.max(0, (total||0) - (cached||0));
 const $ = s=>document.querySelector(s);
 
 let mainChart, tokenChart;
@@ -427,11 +429,11 @@ function ensureCharts(series, summary){
   const lat = series.map(s=>s.avgLatency);
   const sum = summary.find(s=>s.provider==='__all__');
   const hint = document.getElementById('tokenHint');
-  if(hint) hint.textContent = sum ? \`RPM \${sum.rpm} \\u00b7 TPM in \${fmt(sum.tpm.input)} / out \${fmt(sum.tpm.output)} \\u00b7 tokens/sec \${fmt(sum.tokensPerSec)}\` : '\\u2014';
+  if(hint) hint.textContent = sum ? \`RPM \${sum.rpm} \\u00b7 TPM in \${fmt(sum.tpm.netInput)} / out \${fmt(sum.tpm.output)} \\u00b7 tokens/sec \${fmt(sum.tokensPerSec)}\` : '\\u2014';
   const pal=chartPalette();
   const grid=pal.grid, tick=pal.tick, barColor=pal.bar, lineColor=pal.line, lineBg=pal.lineBg;
   const common = chartDefaults();
-  const tokenData = [sum?sum.inputTokens.total:0, sum?sum.outputTokens.total:0, sum?sum.cachedTokens.total:0];
+  const tokenData = [sum?sum.inputTokens.netTotal:0, sum?sum.outputTokens.total:0, sum?sum.cachedTokens.total:0];
   if(mainChart){
     mainChart.data.labels = labels;
     mainChart.data.datasets[0].data = counts;
@@ -480,7 +482,7 @@ function renderKpis(summary){
     <div class="kpi"><label>Total requests</label><strong>\${fmt(s.totalRequests)}</strong><small>성공률 <span>\${pct(s.successRate)}</span> \u00b7 RPM <span>\${fmt(s.rpm)}</span></small></div>
     <div class="kpi"><label>Avg latency</label><strong>\${ms(s.latency.avg)}</strong><small>P50 <span>\${ms(s.latency.p50)}</span> \u00b7 P95 <span>\${ms(s.latency.p95)}</span> \u00b7 P99 <span>\${ms(s.latency.p99)}</span></small></div>
     <div class="kpi"><label>TTFT</label><strong>\${ms(s.ttft.avg)}</strong><small>P50 <span>\${ms(s.ttft.p50)}</span> \u00b7 P95 <span>\${ms(s.ttft.p95)}</span></small></div>
-    <div class="kpi"><label>Tokens</label><strong>\${fmt(s.inputTokens.total + s.outputTokens.total)}</strong><small>In <span>\${fmt(s.inputTokens.total)}</span> \u00b7 Out <span>\${fmt(s.outputTokens.total)}</span> \u00b7 Cached <span>\${fmt(s.cachedTokens.total)}</span></small></div>
+    <div class="kpi"><label>Tokens</label><strong>\${fmt(s.inputTokens.total + s.outputTokens.total)}</strong><small>In <span>\${fmt(s.inputTokens.netTotal)}</span> \u00b7 Out <span>\${fmt(s.outputTokens.total)}</span> \u00b7 Cached <span>\${fmt(s.cachedTokens.total)}</span></small></div>
     <div class="kpi"><label>Throughput</label><strong>\${toks(s.tokensPerSec)}</strong><small>Output tokens/sec</small></div>
   \`;
 }
@@ -498,8 +500,8 @@ function renderProviders(summaries){
       <div class="metrics">
         <div class="metric"><label>Latency avg</label><b>\${ms(s.latency.avg)}</b><small>P50 \${ms(s.latency.p50)} \\u00b7 P95 \${ms(s.latency.p95)}</small></div>
         <div class="metric"><label>TTFT avg</label><b>\${ms(s.ttft.avg)}</b><small>P95 \${ms(s.ttft.p95)}</small></div>
-        <div class="metric"><label>RPM / TPM</label><b>\${fmt(s.rpm)}</b><small>\${fmt(s.tpm.input)}/\${fmt(s.tpm.output)} tpm</small></div>
-        <div class="metric"><label>Input tokens</label><b>\${fmt(s.inputTokens.total)}</b><small>avg \${fmt(s.inputTokens.avg)}</small></div>
+        <div class="metric"><label>RPM / TPM</label><b>\${fmt(s.rpm)}</b><small>\${fmt(s.tpm.netInput)}/\${fmt(s.tpm.output)} tpm</small></div>
+        <div class="metric"><label>Input tokens</label><b>\${fmt(s.inputTokens.netTotal)}</b><small>avg \${fmt(s.inputTokens.netAvg)}</small></div>
         <div class="metric"><label>Output tokens</label><b>\${fmt(s.outputTokens.total)}</b><small>avg \${fmt(s.outputTokens.avg)} \\u00b7 \${fmt(s.tokensPerSec)}/s</small></div>
         <div class="metric"><label>Cached</label><b>\${fmt(s.cachedTokens.total)}</b><small>P99 \${ms(s.latency.p99)}</small></div>
       </div>
@@ -522,7 +524,7 @@ function renderModelRankings(rankings){
       <td class="mono" style="color:var(--muted-fg);font-weight:500">\${rank}</td>
       <td class="mono" style="font-weight:600;max-width:220px;overflow:hidden;text-overflow:ellipsis" title="\${esc(r.model)}">\${esc(r.model)}</td>
       <td class="mono"><span style="font-weight:600">\${fmt(r.totalTokens)}</span><div class="bar" style="width:80px;margin-top:6px;height:3px" aria-hidden="true"><i style="width:\${w}%"></i></div></td>
-      <td class="mono">\${fmt(r.inputTokens)}</td>
+      <td class="mono">\${fmt(r.netInputTokens)}</td>
       <td class="mono">\${fmt(r.outputTokens)}</td>
       <td class="mono">\${fmt(r.cachedTokens)}</td>
       <td class="mono">\${fmt(r.totalRequests)}</td>
@@ -554,7 +556,7 @@ function renderRecent(){
       <td><span class="status \${sc}">\${r.status}</span></td>
       <td class="mono">\${ms(r.latencyMs)}</td>
       <td class="mono">\${ms(r.ttftMs)}</td>
-      <td class="mono">\${fmt(r.inputTokens)} / \${fmt(r.outputTokens)} / \${fmt(r.cachedTokens)}</td>
+      <td class="mono">\${fmt(netIn(r.inputTokens, r.cachedTokens, r.provider))} / \${fmt(r.outputTokens)} / \${fmt(r.cachedTokens)}</td>
       <td style="text-align:center">\${r.isStreaming?'<span aria-label="streaming" style="width:6px;height:6px;border-radius:50%;background:var(--foreground);display:inline-block"></span>':''}</td>
     </tr>\`;
   }).join('');
