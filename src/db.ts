@@ -12,6 +12,7 @@ export type RequestMetric = {
   inputTokens: number | null;
   outputTokens: number | null;
   cachedTokens: number | null;
+  cacheWriteTokens: number | null;
   totalTokens: number | null;
   requestBytes: number;
   responseBytes: number | null;

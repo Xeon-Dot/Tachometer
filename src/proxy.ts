@@ -40,6 +40,15 @@ const CACHED_KEYS = [
   "cache_read_input_tokens",
   "cached_content_token_count",
 ];
+// 모델이 캐시에 "쓰는" 토큰. Anthropic은 cache_creation_input_tokens,
+// 일부 게이트웨이는 cache_write_tokens 를 쓴다.
+const CACHE_WRITE_KEYS = [
+  "cache_creation_input_tokens",
+  "cache_write_tokens",
+  "cacheWriteTokens",
+  "cacheCreationInputTokens",
+  "cache_write_input_tokens",
+];
 // Chat Completions nests cache reads in prompt_tokens_details,
 // the Responses API nests them in input_tokens_details.
 const CACHE_DETAIL_KEYS = ["prompt_tokens_details", "input_tokens_details"];
@@ -56,10 +65,23 @@ function pickCachedFromDetails(u: Record<string, unknown>): number | null {
   return null;
 }
 
+// 최신 Anthropic usage는 cache_creation: {ephemeral_5m_input_tokens, ephemeral_1h_input_tokens}
+// 로 TTL별 생성 토큰을 나눠 보고한다. 평탄 키가 없을 때만 합산해 사용한다.
+function pickCacheWriteFromDetails(u: Record<string, unknown>): number | null {
+  const details = u.cache_creation;
+  if (!details || typeof details !== "object") return null;
+  const d = details as Record<string, unknown>;
+  const fiveMin = pickNum(d, ["ephemeral_5m_input_tokens"]);
+  const oneHour = pickNum(d, ["ephemeral_1h_input_tokens"]);
+  if (fiveMin === null && oneHour === null) return null;
+  return (fiveMin ?? 0) + (oneHour ?? 0);
+}
+
 function parseTokensFromJson(obj: unknown): {
   inputTokens: number | null;
   outputTokens: number | null;
   cachedTokens: number | null;
+  cacheWriteTokens: number | null;
   totalTokens: number | null;
   model: string | null;
 } {
@@ -67,6 +89,7 @@ function parseTokensFromJson(obj: unknown): {
     inputTokens: null,
     outputTokens: null,
     cachedTokens: null,
+    cacheWriteTokens: null,
     totalTokens: null,
     model: null,
   };
@@ -83,6 +106,7 @@ function parseTokensFromJson(obj: unknown): {
   let inputTokens: number | null = null;
   let outputTokens: number | null = null;
   let cachedTokens: number | null = null;
+  let cacheWriteTokens: number | null = null;
   let totalTokens: number | null = null;
   for (const u of usages) {
     inputTokens = pickNum(u, IN_KEYS) ?? inputTokens;
@@ -90,6 +114,10 @@ function parseTokensFromJson(obj: unknown): {
     totalTokens = pickNum(u, TOTAL_KEYS) ?? totalTokens;
     cachedTokens =
       pickNum(u, CACHED_KEYS) ?? pickCachedFromDetails(u) ?? cachedTokens;
+    cacheWriteTokens =
+      pickNum(u, CACHE_WRITE_KEYS) ??
+      pickCacheWriteFromDetails(u) ??
+      cacheWriteTokens;
   }
   const model: string | null =
     obj.model ??
@@ -99,7 +127,14 @@ function parseTokensFromJson(obj: unknown): {
     null;
   if (inputTokens !== null && outputTokens !== null && totalTokens === null)
     totalTokens = inputTokens + outputTokens;
-  return { inputTokens, outputTokens, cachedTokens, totalTokens, model };
+  return {
+    inputTokens,
+    outputTokens,
+    cachedTokens,
+    cacheWriteTokens,
+    totalTokens,
+    model,
+  };
 }
 
 function tryParseJson(text: string): unknown | null {
@@ -114,6 +149,7 @@ function extractFromSseBuffer(buffer: string) {
   let inputTokens: number | null = null;
   let outputTokens: number | null = null;
   let cachedTokens: number | null = null;
+  let cacheWriteTokens: number | null = null;
   let totalTokens: number | null = null;
   let model: string | null = null;
   const lines = buffer.split("\n");
@@ -130,10 +166,18 @@ function extractFromSseBuffer(buffer: string) {
     if (p.inputTokens !== null) inputTokens = p.inputTokens;
     if (p.outputTokens !== null) outputTokens = p.outputTokens;
     if (p.cachedTokens !== null) cachedTokens = p.cachedTokens;
+    if (p.cacheWriteTokens !== null) cacheWriteTokens = p.cacheWriteTokens;
     if (p.totalTokens !== null) totalTokens = p.totalTokens;
     if (p.model) model = p.model;
   }
-  return { inputTokens, outputTokens, cachedTokens, totalTokens, model };
+  return {
+    inputTokens,
+    outputTokens,
+    cachedTokens,
+    cacheWriteTokens,
+    totalTokens,
+    model,
+  };
 }
 
 export async function handleProxy(request: Request): Promise<Response> {
@@ -189,6 +233,7 @@ export async function handleProxy(request: Request): Promise<Response> {
           inputTokens: null,
           outputTokens: null,
           cachedTokens: null,
+          cacheWriteTokens: null,
           totalTokens: null,
           requestBytes,
           responseBytes: null,

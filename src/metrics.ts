@@ -1,4 +1,5 @@
 import type { RequestMetric } from "./db";
+import { lookupPrices } from "./pricing";
 
 function percentile(sorted: number[], p: number): number | null {
   if (!sorted.length) return null;
@@ -21,10 +22,10 @@ function statsFor(latencies: number[]) {
   };
 }
 
-// Anthropic reports `input_tokens` already excluding cache reads
-// (`cache_read_input_tokens` is separate), so cached tokens must not be
-// subtracted again. Other providers (OpenAI, Gemini, …) count cached tokens
-// inside the prompt/input total.
+// Anthropic reports `input_tokens` already excluding cache reads/writes
+// (`cache_read_input_tokens` / `cache_creation_input_tokens` are separate), so
+// cached tokens must not be subtracted again. Other providers (OpenAI, Gemini, …)
+// count cached tokens inside the prompt/input total.
 export function inputExcludesCached(provider: string): boolean {
   return /anthropic/i.test(provider);
 }
@@ -33,7 +34,90 @@ export function inputExcludesCached(provider: string): boolean {
 export function netInputTokens(item: RequestMetric): number {
   const input = item.inputTokens ?? 0;
   if (inputExcludesCached(item.provider)) return input;
-  return Math.max(0, input - (item.cachedTokens ?? 0));
+  return Math.max(
+    0,
+    input - (item.cachedTokens ?? 0) - (item.cacheWriteTokens ?? 0),
+  );
+}
+
+export type CostBreakdown = {
+  total: number;
+  input: number;
+  output: number;
+  cacheRead: number;
+  cacheWrite: number;
+  /** 가격을 찾아 계산된 요청 수 */
+  pricedRequests: number;
+  /** usage는 있는데 가격을 못 찾은 요청 수 */
+  unpricedRequests: number;
+};
+
+export type RequestCost = Omit<
+  CostBreakdown,
+  "pricedRequests" | "unpricedRequests"
+>;
+
+function roundCost(v: number): number {
+  return Math.round(v * 1e8) / 1e8;
+}
+
+/** usage가 실제로 수집된 요청인지. 가격 미매칭 집계는 이런 요청만 센다. */
+export function hasUsage(item: RequestMetric): boolean {
+  return (
+    (item.inputTokens ?? null) !== null ||
+    (item.outputTokens ?? null) !== null ||
+    (item.cachedTokens ?? null) !== null ||
+    (item.cacheWriteTokens ?? null) !== null
+  );
+}
+
+/** 요청 1건의 USD 비용. 단가를 못 찾으면 null. (USD per 1M tokens 기준) */
+export function requestCost(item: RequestMetric): RequestCost | null {
+  const p = lookupPrices(item.provider, item.model);
+  if (!p) return null;
+  const per = (tokens: number, price: number) => (tokens * price) / 1_000_000;
+  const input = per(netInputTokens(item), p.input);
+  const output = per(item.outputTokens ?? 0, p.output);
+  const cacheRead = per(item.cachedTokens ?? 0, p.cacheRead ?? p.input);
+  const cacheWrite = per(item.cacheWriteTokens ?? 0, p.cacheWrite ?? p.input);
+  return {
+    total: roundCost(input + output + cacheRead + cacheWrite),
+    input: roundCost(input),
+    output: roundCost(output),
+    cacheRead: roundCost(cacheRead),
+    cacheWrite: roundCost(cacheWrite),
+  };
+}
+
+export function computeCost(items: RequestMetric[]): CostBreakdown {
+  const cost: CostBreakdown = {
+    total: 0,
+    input: 0,
+    output: 0,
+    cacheRead: 0,
+    cacheWrite: 0,
+    pricedRequests: 0,
+    unpricedRequests: 0,
+  };
+  for (const item of items) {
+    const c = requestCost(item);
+    if (!c) {
+      if (hasUsage(item)) cost.unpricedRequests++;
+      continue;
+    }
+    cost.total += c.total;
+    cost.input += c.input;
+    cost.output += c.output;
+    cost.cacheRead += c.cacheRead;
+    cost.cacheWrite += c.cacheWrite;
+    cost.pricedRequests++;
+  }
+  cost.total = roundCost(cost.total);
+  cost.input = roundCost(cost.input);
+  cost.output = roundCost(cost.output);
+  cost.cacheRead = roundCost(cost.cacheRead);
+  cost.cacheWrite = roundCost(cost.cacheWrite);
+  return cost;
 }
 
 export type ProviderSummary = {
@@ -62,6 +146,8 @@ export type ProviderSummary = {
   };
   outputTokens: { total: number; avg: number | null };
   cachedTokens: { total: number };
+  cacheWriteTokens: { total: number };
+  cost: CostBreakdown;
   rpm: number;
   tpm: { input: number; output: number; total: number; netInput: number };
   tokensPerSec: number | null;
@@ -83,6 +169,10 @@ function buildSummary(
   const inputTotal = items.reduce((a, i) => a + (i.inputTokens ?? 0), 0);
   const outputTotal = items.reduce((a, i) => a + (i.outputTokens ?? 0), 0);
   const cachedTotal = items.reduce((a, i) => a + (i.cachedTokens ?? 0), 0);
+  const cacheWriteTotal = items.reduce(
+    (a, i) => a + (i.cacheWriteTokens ?? 0),
+    0,
+  );
   const netInputTotal = items.reduce((a, i) => a + netInputTokens(i), 0);
   const totalTokensForRate = items.reduce(
     (a, i) =>
@@ -128,6 +218,8 @@ function buildSummary(
         : null,
     },
     cachedTokens: { total: cachedTotal },
+    cacheWriteTokens: { total: cacheWriteTotal },
+    cost: computeCost(items),
     rpm,
     tpm: {
       input: rate(inputTotal),
@@ -146,6 +238,8 @@ export type ModelRanking = {
   netInputTokens: number;
   outputTokens: number;
   cachedTokens: number;
+  cacheWriteTokens: number;
+  cost: CostBreakdown;
   totalRequests: number;
   avgLatency: number | null;
   providers: string[];
@@ -179,6 +273,10 @@ export function computeModelRankings(items: RequestMetric[]): ModelRanking[] {
     const netInputTokensTotal = group.reduce((a, i) => a + netInputTokens(i), 0);
     const outputTokens = group.reduce((a, i) => a + (i.outputTokens ?? 0), 0);
     const cachedTokens = group.reduce((a, i) => a + (i.cachedTokens ?? 0), 0);
+    const cacheWriteTokens = group.reduce(
+      (a, i) => a + (i.cacheWriteTokens ?? 0),
+      0,
+    );
     const totalTokens = group.reduce(
       (a, i) =>
         a + (i.totalTokens ?? (i.inputTokens ?? 0) + (i.outputTokens ?? 0)),
@@ -195,6 +293,8 @@ export function computeModelRankings(items: RequestMetric[]): ModelRanking[] {
       netInputTokens: netInputTokensTotal,
       outputTokens,
       cachedTokens,
+      cacheWriteTokens,
+      cost: computeCost(group),
       totalRequests: group.length,
       avgLatency,
       providers,

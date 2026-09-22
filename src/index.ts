@@ -4,13 +4,16 @@ import {
   computeSummaries,
   computeTimeSeries,
   computeModelRankings,
+  requestCost,
 } from "./metrics";
+import { initPricing, getPricingMeta } from "./pricing";
 import { handleProxy } from "./proxy";
 import { dashboardHtml } from "./dashboard";
 
 const PORT = Number(process.env.PORT || 3000);
 
 await initDb();
+initPricing();
 
 const app = new Elysia();
 
@@ -26,7 +29,10 @@ app.get("/api/requests", async ({ query }) => {
   const rawProvider = String((query as unknown).provider ?? "all");
   const provider =
     rawProvider && rawProvider !== "all" ? rawProvider : undefined;
-  const requests = await queryMetrics({ limit, provider });
+  const requests = (await queryMetrics({ limit, provider })).map((r) => ({
+    ...r,
+    cost: requestCost(r)?.total ?? null,
+  }));
   return { requests, provider: provider ?? "all" };
 });
 
@@ -68,6 +74,7 @@ app.get("/api/stats", async ({ query }) => {
     total,
     providers,
     provider: provider ?? "all",
+    pricing: getPricingMeta(),
     summaries,
     series,
     modelRankings,

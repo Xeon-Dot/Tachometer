@@ -41,7 +41,7 @@ export const dashboardHtml = `<!DOCTYPE html>
   --status-5xx-bg:#fef2f2;--status-5xx-fg:#b91c1c;--status-5xx-border:#fecdd3;
   --alert-bg:#fef2f2;--alert-fg:#7f1d1d;--alert-border:#fecdd3;
   --skeleton-2:#ececef;
-  --chart-grid:rgba(228,228,231,1);--chart-tick:#52525b;--chart-bar:#18181b;--chart-line:#71717a;--chart-line-bg:rgba(113,113,122,.08);--chart-doughnut:#18181b,#71717a,#e4e4e7;
+  --chart-grid:rgba(228,228,231,1);--chart-tick:#52525b;--chart-bar:#18181b;--chart-line:#71717a;--chart-line-bg:rgba(113,113,122,.08);--chart-doughnut:#18181b,#52525b,#a1a1aa,#e4e4e7;
   --btn-hover:#27272a;--btn-ghost-active:#ececef;
   --shadow-sticky:2px 0 6px rgba(0,0,0,.06);
 }
@@ -66,7 +66,7 @@ html.dark{
   --status-5xx-bg:#450a0a;--status-5xx-fg:#f87171;--status-5xx-border:#991b1b;
   --alert-bg:#450a0a;--alert-fg:#fca5a5;--alert-border:#991b1b;
   --skeleton-2:#1a1a1a;
-  --chart-grid:rgba(63,63,70,1);--chart-tick:#a1a1aa;--chart-bar:#fafafa;--chart-line:#71717a;--chart-line-bg:rgba(113,113,122,.12);--chart-doughnut:#fafafa,#71717a,#3f3f46;
+  --chart-grid:rgba(63,63,70,1);--chart-tick:#a1a1aa;--chart-bar:#fafafa;--chart-line:#71717a;--chart-line-bg:rgba(113,113,122,.12);--chart-doughnut:#fafafa,#a1a1aa,#52525b,#27272a;
   --btn-hover:#3f3f46;--btn-ghost-active:#27272a;
   --shadow-sticky:2px 0 6px rgba(0,0,0,.4);
 }
@@ -110,7 +110,7 @@ html.dark .topbar{background:rgba(0,0,0,.96)}
 @media(prefers-reduced-motion:reduce){.dot{animation:none!important}.btnSpinner{animation:none!important}}
 @keyframes spin{to{transform:rotate(360deg)}}
 .wrap{max-width:1280px;margin:0 auto;padding:24px max(24px, env(safe-area-inset-right)) 48px max(24px, env(safe-area-inset-left))}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:20px 0 16px}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:20px 0 16px}
 .kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 16px 14px;transition:border-color .15s}
 @media(hover:hover){.kpi:hover{border-color:var(--border-strong)}}
 .kpi label{font-size:11px;letter-spacing:.06em;color:var(--muted-fg);text-transform:uppercase;font-weight:600}
@@ -266,6 +266,7 @@ curl https://tacho.xeon.kr/pass/api.some.provider/api/v1/chat/completions ...</p
     <div class="kpi"><div class="skeleton" style="height:11px;width:60px"></div><div class="skeleton" style="height:22px;width:80px;margin-top:12px"></div><div class="skeleton" style="height:12px;width:120px;margin-top:10px"></div></div>
     <div class="kpi"><div class="skeleton" style="height:11px;width:70px"></div><div class="skeleton" style="height:22px;width:80px;margin-top:12px"></div><div class="skeleton" style="height:12px;width:160px;margin-top:10px"></div></div>
     <div class="kpi"><div class="skeleton" style="height:11px;width:80px"></div><div class="skeleton" style="height:22px;width:80px;margin-top:12px"></div><div class="skeleton" style="height:12px;width:140px;margin-top:10px"></div></div>
+    <div class="kpi"><div class="skeleton" style="height:11px;width:60px"></div><div class="skeleton" style="height:22px;width:90px;margin-top:12px"></div><div class="skeleton" style="height:12px;width:160px;margin-top:10px"></div></div>
   </div>
 
   <div class="grid2">
@@ -287,8 +288,8 @@ curl https://tacho.xeon.kr/pass/api.some.provider/api/v1/chat/completions ...</p
   <div class="tableWrap" tabindex="0" aria-label="모델 순위 표, 좌우로 스크롤 가능">
     <table>
       <caption class="sr-only">토큰 사용량 기준 모델 순위</caption>
-      <thead><tr><th scope="col">#</th><th scope="col">모델</th><th scope="col">총 토큰</th><th scope="col">Input</th><th scope="col">Output</th><th scope="col">Cached</th><th scope="col">요청수</th><th scope="col">Avg latency</th><th scope="col">Providers</th></tr></thead>
-      <tbody id="modelRankBody"><tr><td colspan="9" style="text-align:center;color:var(--muted-fg);padding:16px">로딩중…</td></tr></tbody>
+      <thead><tr><th scope="col">#</th><th scope="col">모델</th><th scope="col">총 토큰</th><th scope="col">Input</th><th scope="col">Output</th><th scope="col">Cache R/W</th><th scope="col">비용</th><th scope="col">요청수</th><th scope="col">Avg latency</th><th scope="col">Providers</th></tr></thead>
+      <tbody id="modelRankBody"><tr><td colspan="10" style="text-align:center;color:var(--muted-fg);padding:16px">로딩중…</td></tr></tbody>
     </table>
   </div>
 
@@ -310,8 +311,8 @@ curl https://tacho.xeon.kr/pass/api.some.provider/api/v1/chat/completions ...</p
     <div class="tableWrap" style="border:none;border-radius:0" tabindex="0" aria-label="최근 요청 표, 좌우로 스크롤 가능">
       <table>
         <caption class="sr-only">최근 요청 100개</caption>
-        <thead><tr><th scope="col">시간</th><th scope="col">Provider</th><th scope="col">Path</th><th scope="col">Model</th><th scope="col">Status</th><th scope="col">Latency</th><th scope="col">TTFT</th><th scope="col">In / Out / Cached</th><th scope="col">Stream</th></tr></thead>
-        <tbody id="recentBody" aria-live="polite" aria-atomic="false"><tr><td colspan="9" style="text-align:center;color:var(--muted-fg);padding:20px">로딩중…</td></tr></tbody>
+        <thead><tr><th scope="col">시간</th><th scope="col">Provider</th><th scope="col">Path</th><th scope="col">Model</th><th scope="col">Status</th><th scope="col">Latency</th><th scope="col">TTFT</th><th scope="col">In / Out / Cache R / W</th><th scope="col">비용</th><th scope="col">Stream</th></tr></thead>
+        <tbody id="recentBody" aria-live="polite" aria-atomic="false"><tr><td colspan="10" style="text-align:center;color:var(--muted-fg);padding:20px">로딩중…</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -323,6 +324,8 @@ curl https://tacho.xeon.kr/pass/api.some.provider/api/v1/chat/completions ...</p
     <a href="/api/requests">/api/requests</a>
     <span>·</span>
     <a href="/health">/health</a>
+    <span>·</span>
+    <span id="pricingMeta">가격 데이터 로딩중…</span>
   </div>
 </main>
 
@@ -330,8 +333,10 @@ curl https://tacho.xeon.kr/pass/api.some.provider/api/v1/chat/completions ...</p
 const fmt = n=> n==null ? '\\u2014' : (typeof n==='number'? (Number.isInteger(n)? n.toLocaleString() : n.toLocaleString()): n);
 const ms = n=>{ if(n==null) return '\\u2014'; if(Math.abs(n)>=1000) return (n/1000).toFixed(n>=10000?1:2)+' s'; return n+' ms'; };
 const pct = n=> n==null ? '\\u2014' : n+'%';
+const usd = n=>{ if(n==null) return '\\u2014'; const a=Math.abs(n); const d = a===0 ? 2 : a<0.01 ? 6 : a<1 ? 4 : 2; return '$'+n.toFixed(d); };
 const inputExcludesCached = p=> /anthropic/i.test(String(p||''));
-const netIn = (total, cached, provider)=> inputExcludesCached(provider) ? (total||0) : Math.max(0, (total||0) - (cached||0));
+const netIn = (total, cached, write, provider)=> inputExcludesCached(provider) ? (total||0) : Math.max(0, (total||0) - (cached||0) - (write||0));
+const costCell = c=>{ if(!c) return '\\u2014'; if(!c.pricedRequests && c.unpricedRequests) return '\\u2014'; return usd(c.total); };
 const $ = s=>document.querySelector(s);
 
 let mainChart, tokenChart;
@@ -433,7 +438,7 @@ function ensureCharts(series, summary){
   const pal=chartPalette();
   const grid=pal.grid, tick=pal.tick, barColor=pal.bar, lineColor=pal.line, lineBg=pal.lineBg;
   const common = chartDefaults();
-  const tokenData = [sum?sum.inputTokens.netTotal:0, sum?sum.outputTokens.total:0, sum?sum.cachedTokens.total:0];
+  const tokenData = [sum?sum.inputTokens.netTotal:0, sum?sum.outputTokens.total:0, sum?sum.cachedTokens.total:0, sum?sum.cacheWriteTokens.total:0];
   if(mainChart){
     mainChart.data.labels = labels;
     mainChart.data.datasets[0].data = counts;
@@ -465,7 +470,7 @@ function ensureCharts(series, summary){
   } else {
     tokenChart = new Chart(ctx2, {
       type:'doughnut',
-      data:{labels:['Input','Output','Cached'], datasets:[{data:tokenData, backgroundColor:doughnutColors, borderWidth:0, hoverOffset:1}]},
+      data:{labels:['Input','Output','Cache R','Cache W'], datasets:[{data:tokenData, backgroundColor:doughnutColors, borderWidth:0, hoverOffset:1}]},
       options:{...common, plugins:{legend:{labels:{color:tick,boxWidth:12,font:{family:'JetBrains Mono',size:11},usePointStyle:true}}}, cutout:'64%'}
     });
   }
@@ -482,8 +487,9 @@ function renderKpis(summary){
     <div class="kpi"><label>Total requests</label><strong>\${fmt(s.totalRequests)}</strong><small>성공률 <span>\${pct(s.successRate)}</span> \u00b7 RPM <span>\${fmt(s.rpm)}</span></small></div>
     <div class="kpi"><label>Avg latency</label><strong>\${ms(s.latency.avg)}</strong><small>P50 <span>\${ms(s.latency.p50)}</span> \u00b7 P95 <span>\${ms(s.latency.p95)}</span> \u00b7 P99 <span>\${ms(s.latency.p99)}</span></small></div>
     <div class="kpi"><label>TTFT</label><strong>\${ms(s.ttft.avg)}</strong><small>P50 <span>\${ms(s.ttft.p50)}</span> \u00b7 P95 <span>\${ms(s.ttft.p95)}</span></small></div>
-    <div class="kpi"><label>Tokens</label><strong>\${fmt(s.inputTokens.total + s.outputTokens.total)}</strong><small>In <span>\${fmt(s.inputTokens.netTotal)}</span> \u00b7 Out <span>\${fmt(s.outputTokens.total)}</span> \u00b7 Cached <span>\${fmt(s.cachedTokens.total)}</span></small></div>
+    <div class="kpi"><label>Tokens</label><strong>\${fmt(s.inputTokens.total + s.outputTokens.total)}</strong><small>In <span>\${fmt(s.inputTokens.netTotal)}</span> \u00b7 Out <span>\${fmt(s.outputTokens.total)}</span> \u00b7 Cache R <span>\${fmt(s.cachedTokens.total)}</span> \u00b7 W <span>\${fmt(s.cacheWriteTokens.total)}</span></small></div>
     <div class="kpi"><label>Throughput</label><strong>\${toks(s.tokensPerSec)}</strong><small>Output tokens/sec</small></div>
+    <div class="kpi"><label>Cost</label><strong>\${costCell(s.cost)}</strong><small>Input <span>\${usd(s.cost.input)}</span> \u00b7 Output <span>\${usd(s.cost.output)}</span> \u00b7 Cache <span>\${usd(s.cost.cacheRead + s.cost.cacheWrite)}</span>\${s.cost.unpricedRequests ? ' \\u00b7 미매칭 <span>'+fmt(s.cost.unpricedRequests)+'</span>건' : ''}</small></div>
   \`;
 }
 
@@ -498,12 +504,13 @@ function renderProviders(summaries){
     <div class="prov">
       <h4><span>\${s.provider}</span> <span class="pill">\${s.totalRequests} req</span> <span class="pill" style="margin-left:auto">\${pct(s.successRate)} ok</span></h4>
       <div class="metrics">
-        <div class="metric"><label>Latency avg</label><b>\${ms(s.latency.avg)}</b><small>P50 \${ms(s.latency.p50)} \\u00b7 P95 \${ms(s.latency.p95)}</small></div>
+        <div class="metric"><label>Latency avg</label><b>\${ms(s.latency.avg)}</b><small>P50 \${ms(s.latency.p50)} \\u00b7 P95 \${ms(s.latency.p95)} \\u00b7 P99 \${ms(s.latency.p99)}</small></div>
         <div class="metric"><label>TTFT avg</label><b>\${ms(s.ttft.avg)}</b><small>P95 \${ms(s.ttft.p95)}</small></div>
         <div class="metric"><label>RPM / TPM</label><b>\${fmt(s.rpm)}</b><small>\${fmt(s.tpm.netInput)}/\${fmt(s.tpm.output)} tpm</small></div>
         <div class="metric"><label>Input tokens</label><b>\${fmt(s.inputTokens.netTotal)}</b><small>avg \${fmt(s.inputTokens.netAvg)}</small></div>
         <div class="metric"><label>Output tokens</label><b>\${fmt(s.outputTokens.total)}</b><small>avg \${fmt(s.outputTokens.avg)} \\u00b7 \${fmt(s.tokensPerSec)}/s</small></div>
-        <div class="metric"><label>Cached</label><b>\${fmt(s.cachedTokens.total)}</b><small>P99 \${ms(s.latency.p99)}</small></div>
+        <div class="metric"><label>Cache R / W</label><b>\${fmt(s.cachedTokens.total)} / \${fmt(s.cacheWriteTokens.total)}</b><small>read / write tokens</small></div>
+        <div class="metric" style="grid-column:1/-1"><label>Cost</label><b>\${costCell(s.cost)}</b><small>Input \${usd(s.cost.input)} \\u00b7 Output \${usd(s.cost.output)} \\u00b7 Cache \${usd(s.cost.cacheRead + s.cost.cacheWrite)}\${s.cost.unpricedRequests ? ' \\u00b7 가격 미매칭 '+fmt(s.cost.unpricedRequests)+'건' : ''}</small></div>
       </div>
       <div class="bar" aria-hidden="true"><i style="width:\${Math.min(100,s.successRate)}%"></i></div>
     </div>
@@ -514,7 +521,7 @@ function renderModelRankings(rankings){
   const tb=document.getElementById('modelRankBody');
   const meta=document.getElementById('modelMeta');
   if(meta) meta.textContent = rankings?.length ? \`\${rankings.length} models\` : '';
-  if(!rankings||!rankings.length){ tb.innerHTML='<tr><td colspan="9" style="text-align:center;color:var(--muted-fg);padding:18px">아직 모델 데이터가 없습니다 — 첫 요청의 <span class="mono">usage</span> 가 수집되면 여기에 순위가 생깁니다.</td></tr>'; return; }
+  if(!rankings||!rankings.length){ tb.innerHTML='<tr><td colspan="10" style="text-align:center;color:var(--muted-fg);padding:18px">아직 모델 데이터가 없습니다 — 첫 요청의 <span class="mono">usage</span> 가 수집되면 여기에 순위가 생깁니다.</td></tr>'; return; }
   const max = Math.max(...rankings.map(r=>r.totalTokens),1);
   tb.innerHTML = rankings.map((r,i)=>{
     const w = Math.round(r.totalTokens/max*100);
@@ -526,7 +533,8 @@ function renderModelRankings(rankings){
       <td class="mono"><span style="font-weight:600">\${fmt(r.totalTokens)}</span><div class="bar" style="width:80px;margin-top:6px;height:3px" aria-hidden="true"><i style="width:\${w}%"></i></div></td>
       <td class="mono">\${fmt(r.netInputTokens)}</td>
       <td class="mono">\${fmt(r.outputTokens)}</td>
-      <td class="mono">\${fmt(r.cachedTokens)}</td>
+      <td class="mono">\${fmt(r.cachedTokens)} / \${fmt(r.cacheWriteTokens)}</td>
+      <td class="mono" title="\${r.cost && r.cost.unpricedRequests ? '가격 미매칭 '+r.cost.unpricedRequests+'건' : ''}">\${costCell(r.cost)}</td>
       <td class="mono">\${fmt(r.totalRequests)}</td>
       <td class="mono">\${ms(r.avgLatency)}</td>
       <td class="mono" style="max-width:160px;overflow:hidden;text-overflow:ellipsis" title="\${esc(r.providers.join(', '))}">\${esc(r.providers.join(', '))}</td>
@@ -541,7 +549,7 @@ function renderRecent(){
   if(meta) meta.textContent = list.length ? \`\\u00b7 \${list.length} rows\` : '';
   if(!list.length){
     const emptyMsg = recentRows.length ? '검색 결과가 없습니다 — 다른 키워드로 시도해 보세요.' : '아직 요청이 없습니다 — 위 curl 예시로 첫 요청을 보내보세요.';
-    tb.innerHTML = \`<tr><td colspan="9" style="text-align:center;color:var(--muted-fg);padding:22px">\${emptyMsg}</td></tr>\`; return;
+    tb.innerHTML = \`<tr><td colspan="10" style="text-align:center;color:var(--muted-fg);padding:22px">\${emptyMsg}</td></tr>\`; return;
   }
   tb.innerHTML = list.slice(0,100).map(r=>{
     const d = new Date(r.timestamp);
@@ -556,7 +564,8 @@ function renderRecent(){
       <td><span class="status \${sc}">\${r.status}</span></td>
       <td class="mono">\${ms(r.latencyMs)}</td>
       <td class="mono">\${ms(r.ttftMs)}</td>
-      <td class="mono">\${fmt(netIn(r.inputTokens, r.cachedTokens, r.provider))} / \${fmt(r.outputTokens)} / \${fmt(r.cachedTokens)}</td>
+      <td class="mono">\${fmt(netIn(r.inputTokens, r.cachedTokens, r.cacheWriteTokens, r.provider))} / \${fmt(r.outputTokens)} / \${fmt(r.cachedTokens)} / \${fmt(r.cacheWriteTokens)}</td>
+      <td class="mono">\${usd(r.cost)}</td>
       <td style="text-align:center">\${r.isStreaming?'<span aria-label="streaming" style="width:6px;height:6px;border-radius:50%;background:var(--foreground);display:inline-block"></span>':''}</td>
     </tr>\`;
   }).join('');
@@ -611,6 +620,14 @@ async function load(){
     document.getElementById('reqCount').textContent = statsRes.total ?? statsRes.summaries?.find(s=>s.provider==='__all__')?.totalRequests ?? 0;
     const provLabel = (statsRes.provider && statsRes.provider !== 'all') ? ' \\u00b7 ' + statsRes.provider : '';
     document.getElementById('chartMeta').textContent = (w === 'all' ? '전체 시간' : 'window ' + w + 'm') + provLabel;
+    const pm = document.getElementById('pricingMeta');
+    if(pm){
+      const pr = statsRes.pricing;
+      if(!pr) pm.textContent = '';
+      else if(pr.error) pm.textContent = 'pricing 오류: ' + pr.error;
+      else if(!pr.updatedAt) pm.textContent = 'pricing 로딩중…';
+      else pm.textContent = 'pricing ' + fmt(pr.models) + ' models · updated ' + new Date(pr.updatedAt).toLocaleTimeString('ko-KR');
+    }
     renderKpis(statsRes.summaries||[]);
     renderProviders(statsRes.summaries||[]);
     renderModelRankings(statsRes.modelRankings||[]);

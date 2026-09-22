@@ -12,7 +12,7 @@ bun run build            # bun build → dist/, --target bun
 docker compose up --build
 ```
 
-Env (Bun loads `.env`): `PORT` (3000), `MONGO_URL` or `MONGODB_URI`, `DB_NAME` (`tachometer`), `REQUIRE_MONGO` (`1`/`true`/`yes`/`on` → Mongo 연결 실패 시 서버 시작 자체를 실패, 폴백 없음). Mongo is optional — connect fails → in-memory store (cap 10_000).
+Env (Bun loads `.env`): `PORT` (3000), `MONGO_URL` or `MONGODB_URI`, `DB_NAME` (`tachometer`), `REQUIRE_MONGO` (`1`/`true`/`yes`/`on` → Mongo 연결 실패 시 서버 시작 자체를 실패, 폴백 없음), `PRICING_URL` (기본 `https://models.dev/api.json`). Mongo is optional — connect fails → in-memory store (cap 10_000).
 
 ## Layout
 
@@ -20,8 +20,9 @@ Env (Bun loads `.env`): `PORT` (3000), `MONGO_URL` or `MONGODB_URI`, `DB_NAME` (
 | ------------------ | ---------------------------------------------------------------------------------------------- |
 | `src/index.ts`     | Elysia app. Register new routes **before** `app.all("/*")`.                                    |
 | `src/proxy.ts`     | HTTPS passthrough + token/TTFT scrape                                                          |
-| `src/metrics.ts`   | In-process aggregations                                                                        |
+| `src/metrics.ts`   | In-process aggregations (tokens, latency, cost via pricing.ts)                                                                        |
 | `src/db.ts`        | Mongo collection `requests`; memory fallback                                                   |
+| `src/pricing.ts` | models.dev `api.json` loader (6h refresh) + (host, model) -> USD per 1M tokens; not persisted |
 | `src/dashboard.ts` | Entire UI as one HTML/CSS/JS template string (Chart.js CDN). Do not split into a frontend app. |
 
 `.commandcode/` is design notes, not runtime.
@@ -37,8 +38,8 @@ Env (Bun loads `.env`): `PORT` (3000), `MONGO_URL` or `MONGODB_URI`, `DB_NAME` (
 
 - `GET /` dashboard
 - `GET /health` always 200; `db` is `"mongodb"` \| `"memory"` (compose/Dockerfile healthcheck uses this)
-- `GET /api/stats?window=60` window max 1440 min; `window=all` = 전체 시간 (데이터 전체 집계, 응답의 `windowMinutes`는 실제 데이터 스팬 분, `allTime: true`); includes synthetic provider `__all__`; `modelRankings` sorted by total tokens
-- `GET /api/requests?limit=100` limit max 500
+- `GET /api/stats?window=60` window max 1440 min; `window=all` = 전체 시간 (데이터 전체 집계, 응답의 `windowMinutes`는 실제 데이터 스팬 분, `allTime: true`); includes synthetic provider `__all__`; `modelRankings` sorted by total tokens; `pricing` = 가격표 메타(`updatedAt`/`models`/`error`); each summary/ranking has `cost` (USD, `pricedRequests`/`unpricedRequests`) and `cacheWriteTokens`
+- `GET /api/requests?limit=100` limit max 500; 각 행에 `cost`(USD, 가격 미매칭이면 `null`) 포함
 
 ## CI / Docker
 
