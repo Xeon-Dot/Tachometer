@@ -311,8 +311,8 @@ curl https://tacho.xeon.kr/pass/api.some.provider/api/v1/chat/completions ...</p
     <div class="tableWrap" style="border:none;border-radius:0" tabindex="0" aria-label="Recent requests table, scrollable horizontally">
       <table>
         <caption class="sr-only">Last 100 requests</caption>
-        <thead><tr><th scope="col">Time</th><th scope="col">Provider</th><th scope="col">Path</th><th scope="col">Model</th><th scope="col">Status</th><th scope="col">Latency</th><th scope="col">TTFT</th><th scope="col">In / Out | Cache R / W</th><th scope="col">Cost</th><th scope="col">Stream</th></tr></thead>
-        <tbody id="recentBody" aria-live="polite" aria-atomic="false"><tr><td colspan="10" style="text-align:center;color:var(--muted-fg);padding:20px">Loading…</td></tr></tbody>
+        <thead><tr><th scope="col">Time</th><th scope="col">Provider</th><th scope="col">Path</th><th scope="col">Model</th><th scope="col">Status</th><th scope="col">Latency</th><th scope="col">TTFT</th><th scope="col">In / Out | Cache R / W</th><th scope="col">Cost</th></tr></thead>
+        <tbody id="recentBody" aria-live="polite" aria-atomic="false"><tr><td colspan="9" style="text-align:center;color:var(--muted-fg);padding:20px">Loading…</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -550,7 +550,7 @@ function renderRecent(){
   if(meta) meta.textContent = list.length ? \`\\u00b7 \${list.length} rows\` : '';
   if(!list.length){
     const emptyMsg = recentRows.length ? 'No results — try a different keyword.' : 'No requests yet — send your first request using the curl example above.';
-    tb.innerHTML = \`<tr><td colspan="10" style="text-align:center;color:var(--muted-fg);padding:22px">\${emptyMsg}</td></tr>\`; return;
+    tb.innerHTML = \`<tr><td colspan="9" style="text-align:center;color:var(--muted-fg);padding:22px">\${emptyMsg}</td></tr>\`; return;
   }
   tb.innerHTML = list.slice(0,100).map(r=>{
     const d = new Date(r.timestamp);
@@ -567,7 +567,6 @@ function renderRecent(){
       <td class="mono">\${ms(r.ttftMs)}</td>
       <td class="mono">\${fmt(netIn(r.inputTokens, r.cachedTokens, r.cacheWriteTokens, r.provider))} / \${fmt(r.outputTokens)} / \${fmt(r.cachedTokens)} / \${fmt(r.cacheWriteTokens)}</td>
       <td class="mono">\${usd(r.cost)}</td>
-      <td style="text-align:center">\${r.isStreaming?'<span aria-label="streaming" style="width:6px;height:6px;border-radius:50%;background:var(--foreground);display:inline-block"></span>':''}</td>
     </tr>\`;
   }).join('');
 }
