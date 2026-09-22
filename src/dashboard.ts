@@ -311,7 +311,7 @@ curl https://tacho.xeon.kr/pass/api.some.provider/api/v1/chat/completions ...</p
     <div class="tableWrap" style="border:none;border-radius:0" tabindex="0" aria-label="Recent requests table, scrollable horizontally">
       <table>
         <caption class="sr-only">Last 100 requests</caption>
-        <thead><tr><th scope="col">Time</th><th scope="col">Provider</th><th scope="col">Path</th><th scope="col">Model</th><th scope="col">Status</th><th scope="col">Latency</th><th scope="col">TTFT</th><th scope="col">In / Out / Cache R / W</th><th scope="col">Cost</th><th scope="col">Stream</th></tr></thead>
+        <thead><tr><th scope="col">Time</th><th scope="col">Provider</th><th scope="col">Path</th><th scope="col">Model</th><th scope="col">Status</th><th scope="col">Latency</th><th scope="col">TTFT</th><th scope="col">In / Out | Cache R / W</th><th scope="col">Cost</th><th scope="col">Stream</th></tr></thead>
         <tbody id="recentBody" aria-live="polite" aria-atomic="false"><tr><td colspan="10" style="text-align:center;color:var(--muted-fg);padding:20px">Loading…</td></tr></tbody>
       </table>
     </div>
