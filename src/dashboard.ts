@@ -1,5 +1,5 @@
 export const dashboardHtml = `<!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
@@ -208,43 +208,43 @@ tbody tr:focus-within td{background:var(--table-row-hover)}
 </style>
 </head>
 <body>
-<a href="#main" class="sr-only" style="position:absolute;top:8px;left:8px;background:var(--primary);color:var(--primary-fg);padding:8px 12px;border-radius:6px;z-index:50">본문으로 건너뛰기</a>
+<a href="#main" class="sr-only" style="position:absolute;top:8px;left:8px;background:var(--primary);color:var(--primary-fg);padding:8px 12px;border-radius:6px;z-index:50">Skip to content</a>
 <div class="topbar" role="banner">
   <div class="brand" aria-label="Tachometer">
     <div class="logo" aria-hidden="true">◉</div>
     <div>
       <h1>TACHOMETER <span class="mono" style="font-size:11px">/ tacho.xeon.kr</span></h1>
-      <p>AI API Proxy · 실시간 성능 계측</p>
+      <p>AI API Proxy · Real-time performance metering</p>
     </div>
   </div>
-  <div class="controls" role="toolbar" aria-label="대시보드 컨트롤">
+  <div class="controls" role="toolbar" aria-label="Dashboard controls">
     <span class="badge" aria-live="polite" aria-atomic="true"><i class="dot" aria-hidden="true"></i> <span id="liveText">LIVE</span> <span style="color:var(--muted-fg-soft)" aria-hidden="true">·</span> <span id="reqCount" class="mono" style="font-weight:600">—</span><span style="color:var(--muted-fg)">req</span></span>
-    <button class="btn btn-ghost themeBtn" id="themeBtn" type="button" aria-label="테마 변경" title="테마"><span class="themeIcon" id="themeIcon" aria-hidden="true"></span></button>
-    <label class="sr-only" for="providerSel">프로바이더</label>
-    <select id="providerSel" class="select" aria-label="프로바이더">
-      <option value="all">전체 프로바이더</option>
+    <button class="btn btn-ghost themeBtn" id="themeBtn" type="button" aria-label="Change theme" title="Theme"><span class="themeIcon" id="themeIcon" aria-hidden="true"></span></button>
+    <label class="sr-only" for="providerSel">Provider</label>
+    <select id="providerSel" class="select" aria-label="Provider">
+      <option value="all">All providers</option>
     </select>
-    <label class="sr-only" for="windowSel">시간 윈도우</label>
-    <select id="windowSel" class="select" aria-label="시간 윈도우">
-      <option value="5">최근 5분</option>
-      <option value="15">최근 15분</option>
-      <option value="60" selected>최근 60분</option>
-      <option value="180">최근 3시간</option>
-      <option value="1440">최근 24시간</option>
-      <option value="all">전체 시간</option>
+    <label class="sr-only" for="windowSel">Time window</label>
+    <select id="windowSel" class="select" aria-label="Time window">
+      <option value="5">Last 5 min</option>
+      <option value="15">Last 15 min</option>
+      <option value="60" selected>Last 60 min</option>
+      <option value="180">Last 3 hours</option>
+      <option value="1440">Last 24 hours</option>
+      <option value="all">All time</option>
     </select>
-    <button class="btn" id="refreshBtn" type="button" aria-label="새로고침"><span class="btnSpinner" aria-hidden="true"></span><span class="btnLabel">새로고침</span></button>
+    <button class="btn" id="refreshBtn" type="button" aria-label="Refresh"><span class="btnSpinner" aria-hidden="true"></span><span class="btnLabel">Refresh</span></button>
   </div>
 </div>
 
 <main id="main" class="wrap">
   <section class="card" style="padding:16px" aria-labelledby="usageTitle">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px;min-width:0">
-      <h3 id="usageTitle" style="margin:0">프록시 사용법</h3>
+      <h3 id="usageTitle" style="margin:0">Proxy usage</h3>
       <span class="mono inline-meta" style="word-break:break-all">POST https://tacho.xeon.kr/pass/&lt;target-host&gt;/&lt;path&gt;</span>
     </div>
     <div class="codeWrap">
-      <pre class="code" id="exampleCode" tabindex="0" aria-label="curl 예시">curl https://tacho.xeon.kr/pass/api.openai.com/v1/responses \\
+      <pre class="code" id="exampleCode" tabindex="0" aria-label="curl example">curl https://tacho.xeon.kr/pass/api.openai.com/v1/responses \\
   -H "Authorization: Bearer $OPENAI_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{"model":"gpt-4o-mini","input":"hello"}'
@@ -253,7 +253,7 @@ tbody tr:focus-within td{background:var(--table-row-hover)}
 curl https://tacho.xeon.kr/pass/api.anthropic.com/v1/messages \\
   -H "x-api-key: $ANTHROPIC_API_KEY" ...
 
-# 임의 프로바이더도 동일 패턴
+# Any provider uses the same pattern
 curl https://tacho.xeon.kr/pass/api.some.provider/api/v1/chat/completions ...</pre>
     </div>
   </section>
@@ -271,30 +271,30 @@ curl https://tacho.xeon.kr/pass/api.some.provider/api/v1/chat/completions ...</p
 
   <div class="grid2">
     <div class="card" style="min-width:0;overflow:hidden">
-      <h3>요청량 & 지연시간 <small class="mono" id="chartMeta">—</small></h3>
-      <div class="chartBox"><canvas id="mainChart" height="140" role="img" aria-label="시간대별 요청량과 지연시간 차트"></canvas></div>
+      <h3>Requests & latency <small class="mono" id="chartMeta">—</small></h3>
+      <div class="chartBox"><canvas id="mainChart" height="140" role="img" aria-label="Requests and latency over time chart"></canvas></div>
     </div>
     <div class="card" style="min-width:0;overflow:hidden">
-      <h3>토큰 처리량</h3>
-      <div class="chartBox"><canvas id="tokenChart" height="140" role="img" aria-label="입력 출력 캐시 토큰 분포"></canvas></div>
+      <h3>Token throughput</h3>
+      <div class="chartBox"><canvas id="tokenChart" height="140" role="img" aria-label="Input, output, and cache token distribution"></canvas></div>
       <div class="hint mono" id="tokenHint" style="margin-top:12px;font-size:11px;overflow-wrap:anywhere" aria-live="polite">—</div>
     </div>
   </div>
 
   <div class="section-head">
-    <h3>모델 순위 <span style="color:var(--muted-fg);font-weight:400">· 토큰 사용량 기준</span></h3>
+    <h3>Model rankings <span style="color:var(--muted-fg);font-weight:400">· by token usage</span></h3>
     <p class="mono inline-meta" id="modelMeta" aria-live="polite"></p>
   </div>
-  <div class="tableWrap" tabindex="0" aria-label="모델 순위 표, 좌우로 스크롤 가능">
+  <div class="tableWrap" tabindex="0" aria-label="Model rankings table, scrollable horizontally">
     <table>
-      <caption class="sr-only">토큰 사용량 기준 모델 순위</caption>
-      <thead><tr><th scope="col">#</th><th scope="col">모델</th><th scope="col">총 토큰</th><th scope="col">Input</th><th scope="col">Output</th><th scope="col">Cache R/W</th><th scope="col">비용</th><th scope="col">요청수</th><th scope="col">Avg latency</th><th scope="col">Providers</th></tr></thead>
-      <tbody id="modelRankBody"><tr><td colspan="10" style="text-align:center;color:var(--muted-fg);padding:16px">로딩중…</td></tr></tbody>
+      <caption class="sr-only">Model rankings</caption>
+      <thead><tr><th scope="col">#</th><th scope="col">Model</th><th scope="col">Total tokens</th><th scope="col">Input</th><th scope="col">Output</th><th scope="col">Cache R/W</th><th scope="col">Cost</th><th scope="col">Requests</th><th scope="col">Avg latency</th><th scope="col">Providers</th></tr></thead>
+      <tbody id="modelRankBody"><tr><td colspan="10" style="text-align:center;color:var(--muted-fg);padding:16px">Loading…</td></tr></tbody>
     </table>
   </div>
 
   <div class="section-head">
-    <h3>프로바이더 별 요약</h3>
+    <h3>Provider summary</h3>
     <span class="mono inline-meta" id="providerMeta" aria-live="polite"></span>
   </div>
   <div class="providers" id="providers" aria-live="polite" aria-busy="true">
@@ -303,16 +303,16 @@ curl https://tacho.xeon.kr/pass/api.some.provider/api/v1/chat/completions ...</p
 
   <div class="card" style="padding:0;overflow:hidden;margin-top:16px;max-width:100%">
     <div class="recentHead">
-      <h3 style="margin:0;flex:0 0 auto">최근 요청 <span style="color:var(--muted-fg);font-weight:400" id="recentMeta"></span></h3>
+      <h3 style="margin:0;flex:0 0 auto">Recent requests <span style="color:var(--muted-fg);font-weight:400" id="recentMeta"></span></h3>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-width:0;flex:1 1 220px;justify-content:flex-end">
-        <span class="mono inline-meta" style="white-space:nowrap">최근 100개</span>
+        <span class="mono inline-meta" style="white-space:nowrap">Last 100</span>
       </div>
     </div>
-    <div class="tableWrap" style="border:none;border-radius:0" tabindex="0" aria-label="최근 요청 표, 좌우로 스크롤 가능">
+    <div class="tableWrap" style="border:none;border-radius:0" tabindex="0" aria-label="Recent requests table, scrollable horizontally">
       <table>
-        <caption class="sr-only">최근 요청 100개</caption>
-        <thead><tr><th scope="col">시간</th><th scope="col">Provider</th><th scope="col">Path</th><th scope="col">Model</th><th scope="col">Status</th><th scope="col">Latency</th><th scope="col">TTFT</th><th scope="col">In / Out / Cache R / W</th><th scope="col">비용</th><th scope="col">Stream</th></tr></thead>
-        <tbody id="recentBody" aria-live="polite" aria-atomic="false"><tr><td colspan="10" style="text-align:center;color:var(--muted-fg);padding:20px">로딩중…</td></tr></tbody>
+        <caption class="sr-only">Last 100 requests</caption>
+        <thead><tr><th scope="col">Time</th><th scope="col">Provider</th><th scope="col">Path</th><th scope="col">Model</th><th scope="col">Status</th><th scope="col">Latency</th><th scope="col">TTFT</th><th scope="col">In / Out / Cache R / W</th><th scope="col">Cost</th><th scope="col">Stream</th></tr></thead>
+        <tbody id="recentBody" aria-live="polite" aria-atomic="false"><tr><td colspan="10" style="text-align:center;color:var(--muted-fg);padding:20px">Loading…</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -325,13 +325,14 @@ curl https://tacho.xeon.kr/pass/api.some.provider/api/v1/chat/completions ...</p
     <span>·</span>
     <a href="/health">/health</a>
     <span>·</span>
-    <span id="pricingMeta">가격 데이터 로딩중…</span>
+    <span id="pricingMeta">Loading pricing data…</span>
   </div>
 </main>
 
 <script>
 const fmt = n=> n==null ? '\\u2014' : (typeof n==='number'? (Number.isInteger(n)? n.toLocaleString() : n.toLocaleString()): n);
 const ms = n=>{ if(n==null) return '\\u2014'; if(Math.abs(n)>=1000) return (n/1000).toFixed(n>=10000?1:2)+' s'; return n+' ms'; };
+const localTime = t=> new Date(t).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
 const pct = n=> n==null ? '\\u2014' : n+'%';
 const usd = n=>{ if(n==null) return '\\u2014'; const a=Math.abs(n); const d = a===0 ? 2 : a<0.01 ? 6 : a<1 ? 4 : 2; return '$'+n.toFixed(d); };
 const inputExcludesCached = p=> /anthropic/i.test(String(p||''));
@@ -343,7 +344,7 @@ let mainChart, tokenChart;
 let recentRows = [];
 const reducedMotion = typeof window.matchMedia==='function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const THEME_KEY='theme';
-const THEME_LABEL={light:'라이트',dark:'다크',system:'시스템'};
+const THEME_LABEL={light:'Light',dark:'Dark',system:'System'};
 const THEME_ICON={light:'☀',dark:'☾',system:'◐'};
 const themeMedia = typeof window.matchMedia==='function' ? window.matchMedia('(prefers-color-scheme: dark)') : null;
 
@@ -364,8 +365,8 @@ function applyTheme(){
   const btn=document.getElementById('themeBtn');
   if(btn){
     const label=THEME_LABEL[mode];
-    btn.title='테마: '+label;
-    btn.setAttribute('aria-label','테마 변경 — 현재 '+label+', 눌러서 전환');
+    btn.title='Theme: '+label;
+    btn.setAttribute('aria-label','Change theme — currently '+label+', click to switch');
   }
   applyChartTheme();
 }
@@ -429,7 +430,7 @@ function ensureCharts(series, summary){
   const ctx1 = document.getElementById('mainChart');
   const ctx2 = document.getElementById('tokenChart');
   if(!ctx1 || !ctx2) return;
-  const labels = series.map(s=>s.time);
+  const labels = series.map(s=>localTime(s.time));
   const counts = series.map(s=>s.count);
   const lat = series.map(s=>s.avgLatency);
   const sum = summary.find(s=>s.provider==='__all__');
@@ -481,15 +482,15 @@ function renderKpis(summary){
   const el = document.getElementById('kpis');
   if(!el) return;
   el.setAttribute('aria-busy','false');
-  if(!s){ el.innerHTML = '<div class="kpi"><label>아직 데이터 없음</label><strong>\u2014</strong><small>프록시로 첫 요청을 보내면 여기에 수치가 채워집니다. 위 curl 예시를 그대로 실행해 보세요.</small></div>'; return; }
+  if(!s){ el.innerHTML = '<div class="kpi"><label>No data yet</label><strong>\u2014</strong><small>Send your first request through the proxy and the numbers will appear here. Try the curl example above.</small></div>'; return; }
   const toks = n=> n==null ? '\u2014' : n+' tok/s';
   el.innerHTML = \`
-    <div class="kpi"><label>Total requests</label><strong>\${fmt(s.totalRequests)}</strong><small>성공률 <span>\${pct(s.successRate)}</span> \u00b7 RPM <span>\${fmt(s.rpm)}</span></small></div>
+    <div class="kpi"><label>Total requests</label><strong>\${fmt(s.totalRequests)}</strong><small>Success rate <span>\${pct(s.successRate)}</span> \u00b7 RPM <span>\${fmt(s.rpm)}</span></small></div>
     <div class="kpi"><label>Avg latency</label><strong>\${ms(s.latency.avg)}</strong><small>P50 <span>\${ms(s.latency.p50)}</span> \u00b7 P95 <span>\${ms(s.latency.p95)}</span> \u00b7 P99 <span>\${ms(s.latency.p99)}</span></small></div>
     <div class="kpi"><label>TTFT</label><strong>\${ms(s.ttft.avg)}</strong><small>P50 <span>\${ms(s.ttft.p50)}</span> \u00b7 P95 <span>\${ms(s.ttft.p95)}</span></small></div>
     <div class="kpi"><label>Tokens</label><strong>\${fmt(s.inputTokens.total + s.outputTokens.total)}</strong><small>In <span>\${fmt(s.inputTokens.netTotal)}</span> \u00b7 Out <span>\${fmt(s.outputTokens.total)}</span> \u00b7 Cache R <span>\${fmt(s.cachedTokens.total)}</span> \u00b7 W <span>\${fmt(s.cacheWriteTokens.total)}</span></small></div>
     <div class="kpi"><label>Throughput</label><strong>\${toks(s.tokensPerSec)}</strong><small>Output tokens/sec</small></div>
-    <div class="kpi"><label>Cost</label><strong>\${costCell(s.cost)}</strong><small>Input <span>\${usd(s.cost.input)}</span> \u00b7 Output <span>\${usd(s.cost.output)}</span> \u00b7 Cache <span>\${usd(s.cost.cacheRead + s.cost.cacheWrite)}</span>\${s.cost.unpricedRequests ? ' \\u00b7 미매칭 <span>'+fmt(s.cost.unpricedRequests)+'</span>건' : ''}</small></div>
+    <div class="kpi"><label>Cost</label><strong>\${costCell(s.cost)}</strong><small>Input <span>\${usd(s.cost.input)}</span> \u00b7 Output <span>\${usd(s.cost.output)}</span> \u00b7 Cache <span>\${usd(s.cost.cacheRead + s.cost.cacheWrite)}</span>\${s.cost.unpricedRequests ? ' \\u00b7 <span>'+fmt(s.cost.unpricedRequests)+'</span> unpriced' : ''}</small></div>
   \`;
 }
 
@@ -499,7 +500,7 @@ function renderProviders(summaries){
   const list = (summaries||[]).filter(s=>s.provider!=='__all__');
   if(wrap) wrap.setAttribute('aria-busy','false');
   if(meta) meta.textContent = list.length ? \`\${list.length} providers\` : '';
-  if(!list.length){ wrap.innerHTML = '<div class="empty"><strong>아직 수집된 프로바이더가 없습니다.</strong><br/>위 예시처럼 <span class="mono">/pass/&lt;host&gt;/&lt;path&gt;</span> 로 요청을 보내면 여기에 카드가 생깁니다.</div>'; return; }
+  if(!list.length){ wrap.innerHTML = '<div class="empty"><strong>No providers collected yet.</strong><br/>Send a request to <span class="mono">/pass/&lt;host&gt;/&lt;path&gt;</span> as in the example above and a card will appear here.</div>'; return; }
   wrap.innerHTML = list.map(s=>\`
     <div class="prov">
       <h4><span>\${s.provider}</span> <span class="pill">\${s.totalRequests} req</span> <span class="pill" style="margin-left:auto">\${pct(s.successRate)} ok</span></h4>
@@ -510,7 +511,7 @@ function renderProviders(summaries){
         <div class="metric"><label>Input tokens</label><b>\${fmt(s.inputTokens.netTotal)}</b><small>avg \${fmt(s.inputTokens.netAvg)}</small></div>
         <div class="metric"><label>Output tokens</label><b>\${fmt(s.outputTokens.total)}</b><small>avg \${fmt(s.outputTokens.avg)} \\u00b7 \${fmt(s.tokensPerSec)}/s</small></div>
         <div class="metric"><label>Cache R / W</label><b>\${fmt(s.cachedTokens.total)} / \${fmt(s.cacheWriteTokens.total)}</b><small>read / write tokens</small></div>
-        <div class="metric" style="grid-column:1/-1"><label>Cost</label><b>\${costCell(s.cost)}</b><small>Input \${usd(s.cost.input)} \\u00b7 Output \${usd(s.cost.output)} \\u00b7 Cache \${usd(s.cost.cacheRead + s.cost.cacheWrite)}\${s.cost.unpricedRequests ? ' \\u00b7 가격 미매칭 '+fmt(s.cost.unpricedRequests)+'건' : ''}</small></div>
+        <div class="metric" style="grid-column:1/-1"><label>Cost</label><b>\${costCell(s.cost)}</b><small>Input \${usd(s.cost.input)} \\u00b7 Output \${usd(s.cost.output)} \\u00b7 Cache \${usd(s.cost.cacheRead + s.cost.cacheWrite)}\${s.cost.unpricedRequests ? ' \\u00b7 '+fmt(s.cost.unpricedRequests)+' unpriced' : ''}</small></div>
       </div>
       <div class="bar" aria-hidden="true"><i style="width:\${Math.min(100,s.successRate)}%"></i></div>
     </div>
@@ -521,7 +522,7 @@ function renderModelRankings(rankings){
   const tb=document.getElementById('modelRankBody');
   const meta=document.getElementById('modelMeta');
   if(meta) meta.textContent = rankings?.length ? \`\${rankings.length} models\` : '';
-  if(!rankings||!rankings.length){ tb.innerHTML='<tr><td colspan="10" style="text-align:center;color:var(--muted-fg);padding:18px">아직 모델 데이터가 없습니다 — 첫 요청의 <span class="mono">usage</span> 가 수집되면 여기에 순위가 생깁니다.</td></tr>'; return; }
+  if(!rankings||!rankings.length){ tb.innerHTML='<tr><td colspan="10" style="text-align:center;color:var(--muted-fg);padding:18px">No model data yet — rankings appear here once <span class="mono">usage</span> is collected from the first request.</td></tr>'; return; }
   const max = Math.max(...rankings.map(r=>r.totalTokens),1);
   tb.innerHTML = rankings.map((r,i)=>{
     const w = Math.round(r.totalTokens/max*100);
@@ -534,7 +535,7 @@ function renderModelRankings(rankings){
       <td class="mono">\${fmt(r.netInputTokens)}</td>
       <td class="mono">\${fmt(r.outputTokens)}</td>
       <td class="mono">\${fmt(r.cachedTokens)} / \${fmt(r.cacheWriteTokens)}</td>
-      <td class="mono" title="\${r.cost && r.cost.unpricedRequests ? '가격 미매칭 '+r.cost.unpricedRequests+'건' : ''}">\${costCell(r.cost)}</td>
+      <td class="mono" title="\${r.cost && r.cost.unpricedRequests ? r.cost.unpricedRequests+' unpriced' : ''}">\${costCell(r.cost)}</td>
       <td class="mono">\${fmt(r.totalRequests)}</td>
       <td class="mono">\${ms(r.avgLatency)}</td>
       <td class="mono" style="max-width:160px;overflow:hidden;text-overflow:ellipsis" title="\${esc(r.providers.join(', '))}">\${esc(r.providers.join(', '))}</td>
@@ -548,12 +549,12 @@ function renderRecent(){
   const list = recentRows;
   if(meta) meta.textContent = list.length ? \`\\u00b7 \${list.length} rows\` : '';
   if(!list.length){
-    const emptyMsg = recentRows.length ? '검색 결과가 없습니다 — 다른 키워드로 시도해 보세요.' : '아직 요청이 없습니다 — 위 curl 예시로 첫 요청을 보내보세요.';
+    const emptyMsg = recentRows.length ? 'No results — try a different keyword.' : 'No requests yet — send your first request using the curl example above.';
     tb.innerHTML = \`<tr><td colspan="10" style="text-align:center;color:var(--muted-fg);padding:22px">\${emptyMsg}</td></tr>\`; return;
   }
   tb.innerHTML = list.slice(0,100).map(r=>{
     const d = new Date(r.timestamp);
-    const t = d.toLocaleString('ko-KR');
+    const t = d.toLocaleString('en-US');
     const sc = r.status>=500?'s5xx':r.status>=400?'s4xx':'s2xx';
     const esc = s=> String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;');
     return \`<tr>
@@ -583,7 +584,7 @@ function syncProviderOptions(providers, current){
     return;
   }
   ps.dataset.optsKey = key;
-  ps.innerHTML = '<option value="all">전체 프로바이더</option>' + list.map(function(p){ return '<option value="' + escAttr(p) + '">' + escAttr(p) + '</option>'; }).join('');
+  ps.innerHTML = '<option value="all">All providers</option>' + list.map(function(p){ return '<option value="' + escAttr(p) + '">' + escAttr(p) + '</option>'; }).join('');
   if(current && current !== 'all' && !list.includes(current)){
     const opt = document.createElement('option');
     opt.value = current; opt.textContent = current;
@@ -619,14 +620,14 @@ async function load(){
     recentRows = reqRes.requests||[];
     document.getElementById('reqCount').textContent = statsRes.total ?? statsRes.summaries?.find(s=>s.provider==='__all__')?.totalRequests ?? 0;
     const provLabel = (statsRes.provider && statsRes.provider !== 'all') ? ' \\u00b7 ' + statsRes.provider : '';
-    document.getElementById('chartMeta').textContent = (w === 'all' ? '전체 시간' : 'window ' + w + 'm') + provLabel;
+    document.getElementById('chartMeta').textContent = (w === 'all' ? 'All time' : 'window ' + w + 'm') + provLabel;
     const pm = document.getElementById('pricingMeta');
     if(pm){
       const pr = statsRes.pricing;
       if(!pr) pm.textContent = '';
-      else if(pr.error) pm.textContent = 'pricing 오류: ' + pr.error;
-      else if(!pr.updatedAt) pm.textContent = 'pricing 로딩중…';
-      else pm.textContent = 'pricing ' + fmt(pr.models) + ' models · updated ' + new Date(pr.updatedAt).toLocaleTimeString('ko-KR');
+      else if(pr.error) pm.textContent = 'pricing error: ' + pr.error;
+      else if(!pr.updatedAt) pm.textContent = 'Loading pricing…';
+      else pm.textContent = 'pricing ' + fmt(pr.models) + ' models · updated ' + new Date(pr.updatedAt).toLocaleTimeString('en-US');
     }
     renderKpis(statsRes.summaries||[]);
     renderProviders(statsRes.summaries||[]);
@@ -635,7 +636,7 @@ async function load(){
     renderRecent();
   } catch(e){
     const kpis = document.getElementById('kpis');
-    if(kpis && kpis.querySelector('.skeleton')){ kpis.innerHTML = '<div class="alert" role="alert"><span>데이터를 불러오지 못했습니다. 다시 시도하세요.</span></div>'; }
+    if(kpis && kpis.querySelector('.skeleton')){ kpis.innerHTML = '<div class="alert" role="alert"><span>Failed to load data. Please try again.</span></div>'; }
   } finally {
     isLoading = false;
     if(btn){ btn.removeAttribute('aria-busy'); btn.disabled=false; }

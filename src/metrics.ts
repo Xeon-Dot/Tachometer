@@ -352,7 +352,7 @@ export function computeTimeSeries(items: RequestMetric[], windowMinutes = 60) {
       ? Math.round(ttfts.reduce((a, c) => a + c, 0) / ttfts.length)
       : null;
     series.push({
-      time: new Date(start).toISOString().slice(11, 16).replace("T", " "),
+      time: new Date(start).toISOString(),
       count: slice.length,
       avgLatency,
       avgTtft,

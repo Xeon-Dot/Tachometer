@@ -47,7 +47,8 @@ Env (Bun loads `.env`): `PORT` (3000), `MONGO_URL` or `MONGODB_URI`, `DB_NAME` (
 
 ## Conventions
 
-- Dashboard copy is Korean (`lang="ko"`).
+- Dashboard copy is English (`lang="en"`).
+- Timestamps are stored and transported as UTC (ISO 8601 `Z`); the dashboard renders them in the viewer's local timezone.
 - Keep model rankings ordered by total tokens (input+output), not request count or latency.
 - Runtime is Bun. Deps are `elysia` + `mongodb` only.
 - Favicon load in `src/index.ts` passes the `URL` to `Bun.file` directly.
